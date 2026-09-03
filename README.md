@@ -48,6 +48,37 @@ Originally engineered for the AAA action game *DarX*, AOE is completely standalo
 
 ---
 
+## 🎮 Production In Action: DarX Game Showcase (Before vs After)
+
+> **Live Industry Proof**: AOE powers the asset generation and modernization pipeline of **DarX**, a first-person tactical sci-fi action/horror game currently in active development for **Unreal Engine 5 (UE5.5)**.
+
+By leveraging AOE's procedural geometry generators, PBR material compilers, and deterministic zero-clipping spatial solvers, **16 entire character and boss entities** (6 main bosses and 10 combat troops) were transformed from rudimentary prototype whiteboxes into AAA production-ready skeletal meshes in seconds:
+
+| Prototype Whitebox (Before) | AOE Production-Ready Asset (After) |
+| :---: | :---: |
+| *Crude box/sphere geometry, clipping artifacts, flat uncalibrated shaders* | *Bespoke silhouettes, military graphene/chrome PBR, zero-clipping guarantees* |
+
+### 📸 Highlight Showcase:
+
+#### 🤖 Containment Robot Boss (Boss 1)
+![Boss 1: Before vs After](docs/images/case_studies_darx/boss1_antes_vs_despues.png)
+
+#### ⚠️ THE ERROR Quantum Glitch Entity (Boss 2)
+![Boss 2: Before vs After](docs/images/case_studies_darx/boss2_antes_vs_despues.png)
+
+#### 👁️ The Observer Aerospace Drone (Troop 6)
+![Observador: Before vs After](docs/images/case_studies_darx/observador_antes_vs_despues.png)
+
+#### 💥 The Repulsor Kinetic Enforcer (Troop 8)
+![Repulsor: Before vs After](docs/images/case_studies_darx/repulsor_antes_vs_despues.png)
+
+#### 👤 The Static Shadow Glitch Demon (Troop 10)
+![Static Shadow: Before vs After](docs/images/case_studies_darx/static_shadow_antes_vs_despues.png)
+
+👉 **[Explore Full Case Study & All 16 Before vs After Comparisons](docs/DARX-PRODUCTION-CASE-STUDY.md)**
+
+---
+
 ## 🛠️ Key Capabilities (Fases 1 to 80)
 
 1. **Deterministic Intent Compilation**: Translates human/AI descriptions into geometric blueprints (`SemanticMeshSpec`, bounding volumes, socket definitions, and PBR node graphs).
