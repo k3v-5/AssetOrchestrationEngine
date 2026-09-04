@@ -69,6 +69,7 @@ from uaf.golden_slice.repair.engine import (
 )
 from uaf.golden_slice.packaging.manifest import ArtifactEntry, ArtifactManifest, BuildManifest
 from uaf.golden_slice.packaging.builder import CookValidationResult, PackageResult, SlicePackager
+from uaf.golden_slice.packaging.bundle_exporter import UE5BundleExporter
 from uaf.golden_slice.certification.gates import (
     GateEvaluation,
     GatekeeperResult,
@@ -165,6 +166,7 @@ __all__ = [
     "CookValidationResult",
     "PackageResult",
     "SlicePackager",
+    "UE5BundleExporter",
     "GateEvaluation",
     "GatekeeperResult",
     "CertificationGatekeeper",

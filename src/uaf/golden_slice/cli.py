@@ -30,6 +30,10 @@ def create_cli_parser() -> argparse.ArgumentParser:
     all_parser = subparsers.add_parser("all", help="Execute complete autonomous production pipeline")
     all_parser.add_argument("--profile", choices=["BRONZE", "SILVER", "GOLD", "PLATINUM"], default="GOLD")
 
+    export_parser = subparsers.add_parser("export-bundle", help="Export portable drop-in bundle for Unreal Engine 5")
+    export_parser.add_argument("--output", default="dist/AOE_UE5_Bundle.zip", help="Output zip or directory path")
+    export_parser.add_argument("--no-zip", action="store_true", help="Export as directory instead of zip archive")
+
     return parser
 
 
@@ -70,9 +74,9 @@ def run_cli(args: Optional[List[str]] = None) -> int:
     elif parsed.command in ("certify", "all"):
         lvl = CertificationLevel(getattr(parsed, "profile", "GOLD"))
         report = orchestrator.run_full_pipeline(target_level=lvl)
-        print("══════════════════════════════════════")
+        print("======================================")
         print(" UAF GOLDEN SLICE CERTIFICATION")
-        print("══════════════════════════════════════")
+        print("======================================")
         print(f"Generation ........ {'PASS' if report.generation_passed else 'FAIL'}")
         print(f"Integration ....... {'PASS' if report.integration_passed else 'FAIL'}")
         print(f"QA Tests .......... {'PASS' if report.qa_tests_passed else 'FAIL'}")
@@ -86,8 +90,26 @@ def run_cli(args: Optional[List[str]] = None) -> int:
         print(f"REPLAY MISMATCHES  : {report.replay_mismatches}")
         print()
         print(f"FINAL STATUS: {report.final_status}")
-        print("══════════════════════════════════════")
+        print("======================================")
         return 0 if report.is_certified else 1
+    elif parsed.command == "export-bundle":
+        from uaf.golden_slice.packaging.bundle_exporter import UE5BundleExporter
+        exporter = UE5BundleExporter()
+        out_path = getattr(parsed, "output", "dist/AOE_UE5_Bundle.zip")
+        as_zip = not getattr(parsed, "no_zip", False)
+        bundle_res = exporter.create_bundle(manifest, output_path=out_path, as_zip=as_zip)
+        print("======================================")
+        print(" AOE PORTABLE UE5 BUNDLE EXPORT")
+        print("======================================")
+        print(f"Project ......: {bundle_res.get('project_id', 'GoldenSlice')}")
+        print(f"Bundle Path ..: {bundle_res['bundle_path']}")
+        print(f"Format .......: {'ZIP Archive' if bundle_res['is_zip'] else 'Directory'}")
+        print(f"Total Files ..: {bundle_res['total_files']}")
+        print(f"Bundle Size ..: {bundle_res['bundle_bytes'] / 1024:.2f} KB")
+        print(f"SHA-256 ......: {bundle_res['sha256'][:16]}...")
+        print("======================================")
+        print("[OK] Portable bundle ready to transfer to your UE5 workstation!")
+        return 0
     else:
         parser.print_help()
         return 0
