@@ -1791,6 +1791,34 @@ from .universal_viewport import (
     UniversalViewportPackager,
 )
 
+# Universal Asset Inspector & Property Grid System (UAF-81.68)
+from .universal_inspector import (
+    PropertyType,
+    PropertyFlags,
+    ValidationSeverity,
+    ValidationTiming,
+    ConflictPolicy,
+    EditorHint,
+    MultiEditMode,
+    InspectorTargetType,
+    MIXED_VALUE,
+    PropertyPath,
+    PropertyMetadata,
+    PropertyDescriptor,
+    PropertyValidationMessage,
+    PropertyDependency,
+    PropertySchema,
+    PropertyClipboard,
+    InspectorEditTransaction,
+    InspectorState,
+    InspectorSnapshot,
+    InspectorTelemetry,
+    InspectorDiagnosticBundle,
+    UniversalInspectorFabricator,
+    UniversalInspectorValidator,
+    UniversalInspectorPackager,
+)
+
 
 
 
@@ -3353,6 +3381,31 @@ __all__ = [
     "UniversalViewportFabricator",
     "UniversalViewportValidator",
     "UniversalViewportPackager",
+    # Universal Asset Inspector & Property Grid System (UAF-81.68)
+    "PropertyType",
+    "PropertyFlags",
+    "ValidationSeverity",
+    "ValidationTiming",
+    "ConflictPolicy",
+    "EditorHint",
+    "MultiEditMode",
+    "InspectorTargetType",
+    "MIXED_VALUE",
+    "PropertyPath",
+    "PropertyMetadata",
+    "PropertyDescriptor",
+    "PropertyValidationMessage",
+    "PropertyDependency",
+    "PropertySchema",
+    "PropertyClipboard",
+    "InspectorEditTransaction",
+    "InspectorState",
+    "InspectorSnapshot",
+    "InspectorTelemetry",
+    "InspectorDiagnosticBundle",
+    "UniversalInspectorFabricator",
+    "UniversalInspectorValidator",
+    "UniversalInspectorPackager",
 ]
 
 
