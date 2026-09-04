@@ -441,7 +441,6 @@ class BrowserStateSnapshot:
 
     def compute_hash(self) -> str:
         canonical = {
-            "snapshot_id": self.snapshot_id,
             "catalog_entries": {k: v for k, v in sorted(self.catalog_entries.items())},
             "selection": sorted(self.selection),
             "tags": {k: v for k, v in sorted(self.tags.items())},
