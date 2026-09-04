@@ -1,102 +1,129 @@
-# Índice de Conocimiento Maestro — DarX Proyect
+# Índice de Conocimiento Maestro — Asset Orchestration Engine (AOE / UAF)
 
-Todo lo que se ha investigado, diseñado, codificado y aprendido en este proyecto, dónde reside cada fichero y en qué orden leerlo. Escrito para que cualquier **desarrollador o agente de IA** pueda ponerse al día de inmediato con máxima velocidad y cero retrabajo.
-
-> **Ubicación Canónica**: La raíz absoluta del proyecto es `E:\Darx_Proyect\` (con guion bajo).
+Este documento es el **mapa de navegación e índice técnico central** del Asset Orchestration Engine (AOE) y el Universal Asset Framework (UAF). Permite a cualquier **desarrollador o agente de IA** comprender de inmediato la estructura del repositorio, localizar especificaciones, inspeccionar código fuente y ejecutar herramientas de exportación e ingesta.
 
 ---
 
-## 🗺️ Por Dónde Empezar
+## 🗺️ Mapa Rápido de Inicio
 
-Si solo vas a leer cuatro documentos clave, hazlo en este orden estricto:
-
-1. **[`docs/REGLAS-DE-TRABAJO.md`](file:///E:/Darx_Proyect/docs/REGLAS-DE-TRABAJO.md)** — **Las 46 Reglas Operativas**. Cada una nacida de un fallo empírico real con su fecha, síntoma, causa raíz y solución obligatoria.
-2. **[`docs/GDD.md`](file:///E:/Darx_Proyect/docs/GDD.md)** — Qué es el juego, loop principal de combate, progresión y mecánicas.
-3. **[`docs/ARTE-BIBLIA.md`](file:///E:/Darx_Proyect/docs/ARTE-BIBLIA.md)** — Directivas visuales, paleta de colores, materiales PBR sin suciedad y composición de pantalla.
-4. **[`docs/SISTEMA-TESTS-AUTOMATIZADOS.md`](file:///E:/Darx_Proyect/docs/SISTEMA-TESTS-AUTOMATIZADOS.md)** — Suite de validación en tiempo real (`.\ejecutar_tests.ps1`) para asegurar el 100% de éxito en assets, shaders, mallas y spawn.
-
----
-
-## 📚 1. Catálogo Completo de Documentación Técnica (`docs/`)
-
-### A. Diseño General y Universo
-| Documento | Descripción y Contenido Clave |
+| Objetivo | Documento / Comando Clave |
 | :--- | :--- |
-| [`GDD.md`](file:///E:/Darx_Proyect/docs/GDD.md) | Documento de Diseño del Juego (Fases 1 a 12). |
-| [`ARTE-BIBLIA.md`](file:///E:/Darx_Proyect/docs/ARTE-BIBLIA.md) | Guía artística obligatoria (iluminación, materiales y colores). |
-| [`GUIA-PERSONAJE-FINAL.md`](file:///E:/Darx_Proyect/docs/GUIA-PERSONAJE-FINAL.md) | Especificación del modelo del jugador, rig y proporciones. |
-| [`DISENO-ARMA.md`](file:///E:/Darx_Proyect/docs/DISENO-ARMA.md) | Pistola láser de energía (sustituye a `DISENO-REVOLVER.md`). |
-| [`PLAN-UV-TEXTURAS.md`](file:///E:/Darx_Proyect/docs/PLAN-UV-TEXTURAS.md) | Densidad de texel y proyección triplanar en shaders de mundo. |
+| **Arquitectura Next-Gen Global** | [`docs/UAF-NEXTGEN-ARCHITECTURE-GUIDE.md`](file:///d:/Proyectos/TEST/AssetOrchestrationEngine/docs/UAF-NEXTGEN-ARCHITECTURE-GUIDE.md) |
+| **Entrega Portátil para Unreal Engine 5** | [`docs/UE5-PORTABLE-WORKFLOW-GUIDE.md`](file:///d:/Proyectos/TEST/AssetOrchestrationEngine/docs/UE5-PORTABLE-WORKFLOW-GUIDE.md) |
+| **Hoja de Ruta y Fases Pendientes** | [`docs/UAF-ROADMAP-PENDIENTES-BACKLOG.md`](file:///d:/Proyectos/TEST/AssetOrchestrationEngine/docs/UAF-ROADMAP-PENDIENTES-BACKLOG.md) |
+| **Ejecutar Suite Completa de Tests** | `py -3.13 -m pytest tests/ -q` (100% pasando, 0 regresiones) |
+| **Exportar Paquete Portátil UE5** | `py -3.13 -m uaf.export.cli export-bundle --level L_GeneratedWorld --output ./export/` |
 
 ---
 
-### B. Especificación de Jefes de Bioma (Bosses 1 a 6)
-| Documento | Jefe | Mecánicas, Modelo 3D, Audio y Combate |
+## 🏛️ 1. Estructura del Código Fuente (`src/`)
+
+```
+src/
+├── uaf/                                 # Universal Asset Factory (UAF Core & Subsistemas)
+│   ├── core/                           # UAF-81.0: Contratos base, identidad, hash canónico, paths y seguridad
+│   │   ├── artifacts/                  # ArtifactLocation, ArtifactManifest, StorageBackend
+│   │   ├── context.py                  # ProjectContext, ExecutionContext, ResourceBudget
+│   │   ├── paths.py                    # PathSecurityValidator, UAFPathResolver
+│   │   ├── hashing.py                  # CanonicalHasher (SHA-256 determinista)
+│   │   ├── operations.py               # Máquina de estados de operaciones (STARTED, SUCCEEDED, etc.)
+│   │   └── diagnostics.py              # Telemetría de ejecución, OperationMetrics, UAFError
+│   │
+│   ├── golden_slice/                   # UAF-81.88: Certificación Autónoma y Golden Vertical Slice
+│   │   ├── pipeline/orchestrator.py    # Orquestador maestro de vertical slice jugable
+│   │   ├── certification/gatekeeper.py # 7 Compuertas de certificación (GatekeeperResult)
+│   │   ├── self_repair/repair_engine.py# Motor de auto-diagnóstico y auto-corrección
+│   │   ├── packaging/packager.py       # Empaquetador de builds y validación de cook
+│   │   └── reporting/html_report.py    # Generador de reportes visuales de certificación
+│   │
+│   ├── vfx_advanced/                   # UAF-81.89: VFX Avanzados, Fluidos y Acoplamiento Ambiental
+│   │   ├── fluid/sph_solver.py         # Simulación de fluidos SPH con conservación de masa
+│   │   ├── mesh_sampling/sampler.py    # Muestreo de huesos y mallas esqueléticas
+│   │   ├── fracture/coupler.py         # Fracturas y escombros reactivos
+│   │   ├── lighting/particle_lights.py # Luces puntuales virtuales (VPL) y sombras profundas
+│   │   ├── lightning/breakdown.py      # Rayos dieléctricos (Laplace / Nemkov)
+│   │   ├── optical/distortion.py       # Ondas de choque refractivas
+│   │   ├── audio_spectral/coupler.py   # Acoplador espectral de audio (ADSR) a Niagara
+│   │   └── jit/compiler.py             # Compilador JIT de scripts VFX a HLSL
+│   │
+│   ├── level_design/                   # UAF-81.90: Diseño de Niveles WFC, Topología & Misiones
+│   │   ├── core/contracts.py           # Sockets modulares, RoomType, PlayerStressMetric
+│   │   ├── wfc/solver2d.py             # Wave Function Collapse 2D (entropía de Shannon, AC-3)
+│   │   ├── wfc/solver3d.py             # Wave Function Collapse 3D (escaleras, elevadores)
+│   │   ├── wfc/presets.py              # Catálogos modulares Sci-Fi listos para usar
+│   │   ├── topology/graph.py           # Grafo de conectividad transitable, A*, BFS, ciclos
+│   │   ├── topology/lock_key.py        # Generador de puertas/llaves con cero-softlocks
+│   │   ├── mission/graph.py            # Grafo de misiones DAG (algoritmo de Kahn, AND/OR)
+│   │   ├── pacing/director.py          # Director de ritmo IA (curva de estrés, FSM de 5 fases)
+│   │   └── export/ue5_exporter.py      # Manifiesto JSON y script Python para Unreal Editor
+│   │
+│   ├── landscape/                      # UAF-81.91: Macro-Paisajes, Erosión y Sustrato PCG
+│   │   ├── core/contracts.py           # Heightfield2D (elevación continua, RAW 16-bit .r16)
+│   │   ├── generation/noise.py         # Perlin, FBM, Ridge Multifractal, Voronoi, Domain Warping
+│   │   ├── erosion/hydraulic.py        # Erosión hidráulica por partículas (gotas)
+│   │   ├── erosion/thermal.py          # Relajación térmica de talud (conservación estricta de masa)
+│   │   ├── ecology/biomes.py           # Clima Whittaker (temperatura, lluvia) y weightmaps de 5 capas
+│   │   ├── infrastructure/drainage.py  # Cuencas de drenaje D8, lechos fluviales y splines de ríos
+│   │   ├── infrastructure/road_network.py # Enrutamiento A* por superficie de costo y splines Catmull-Rom
+│   │   ├── distribution/foliage.py     # Dispersión Blue Noise por disco de Poisson (sustrato PCG)
+│   │   └── export/ue5_landscape_exporter.py # Exportador de .r16, .r8 y script de ingesta UE5
+│   │
+│   ├── ai/                             # UAF-81.92: IA Cognitiva GOAP, Escuadrones y Facciones
+│   │   ├── core/contracts.py           # WorldState, GOAPAction, GOAPGoal, FactionId, TacticalRole
+│   │   ├── goap/planner.py             # Planificador A* en espacio de estados y replanificación
+│   │   ├── squad/tactics.py            # Bounding overwatch, flanqueo >= 60° y brecha de puertas
+│   │   ├── perception/sensor.py        # Conos de visión con oclusión raycast, decaimiento de memoria
+│   │   ├── faction/reputation.py       # Matriz diplomática con efecto cascada por alianzas
+│   │   └── export/ue5_ai_exporter.py   # Exportador de StateTree y Blackboard para UE5
+│   │
+│   └── export/                         # Pipeline Portátil de Entrega UE5
+│       ├── uaf_bundle_exporter.py      # Empaquetador de bundles portátiles (CLI aoe export-bundle)
+│       ├── cli.py                      # Interfaz de línea de comandos del motor
+│       └── UAFBridge/                  # Plugin C++ / Blueprint drop-in para Unreal Engine 5
+│
+└── unreal/                             # Módulos locales de compatibilidad con Unreal
+```
+
+---
+
+## 📚 2. Catálogo Maestro de Especificaciones y Documentación (`docs/`)
+
+### A. Guías de Integración y Flujo de Trabajo
+- [`docs/UAF-NEXTGEN-ARCHITECTURE-GUIDE.md`](file:///d:/Proyectos/TEST/AssetOrchestrationEngine/docs/UAF-NEXTGEN-ARCHITECTURE-GUIDE.md): **Guía maestra de la arquitectura Next-Gen** (Fases 81.88 a 81.92 integradas).
+- [`docs/UE5-PORTABLE-WORKFLOW-GUIDE.md`](file:///d:/Proyectos/TEST/AssetOrchestrationEngine/docs/UE5-PORTABLE-WORKFLOW-GUIDE.md): Manual paso a paso para transferir assets a cualquier PC con Unreal Engine 5 sin dependencias locales.
+- [`docs/UAF-ROADMAP-PENDIENTES-BACKLOG.md`](file:///d:/Proyectos/TEST/AssetOrchestrationEngine/docs/UAF-ROADMAP-PENDIENTES-BACKLOG.md): Registro de fases pendientes (Economía/Loot GAS, MetaSounds, LiveLink bidireccional, QA Playtesting).
+
+### B. Especificaciones Normativas de Fases Estratégicas Recientes
+- [`docs/UAF-81.88-GOLDEN-VERTICAL-SLICE-SPEC.md`](file:///d:/Proyectos/TEST/AssetOrchestrationEngine/docs/UAF-81.88-GOLDEN-VERTICAL-SLICE-SPEC.md): Certificación autónoma, compuertas de calidad y empaquetado de builds reproducibles.
+- [`docs/UAF-81.89-ADVANCED-NEXTGEN-VFX-SPEC.md`](file:///d:/Proyectos/TEST/AssetOrchestrationEngine/docs/UAF-81.89-ADVANCED-NEXTGEN-VFX-SPEC.md): Simulación de fluidos SPH, acoplamiento espectral de audio y compilador JIT Niagara.
+- [`docs/UAF-81.90-PROCEDURAL-LEVEL-DESIGN-SPEC.md`](file:///d:/Proyectos/TEST/AssetOrchestrationEngine/docs/UAF-81.90-PROCEDURAL-LEVEL-DESIGN-SPEC.md): Wave Function Collapse 2D/3D, topología, bucles Lock-and-Key cero-softlock y director de ritmo.
+- [`docs/UAF-81.91-PROCEDURAL-MACRO-LANDSCAPE-SPEC.md`](file:///d:/Proyectos/TEST/AssetOrchestrationEngine/docs/UAF-81.91-PROCEDURAL-MACRO-LANDSCAPE-SPEC.md): Macro-paisajes continuos, erosión física, weightmaps Whittaker y carreteras Catmull-Rom.
+- [`docs/UAF-81.92-MULTI-AGENT-GOAP-SPEC.md`](file:///d:/Proyectos/TEST/AssetOrchestrationEngine/docs/UAF-81.92-MULTI-AGENT-GOAP-SPEC.md): IA cognitiva GOAP, tácticas de escuadrón, percepción sensorial, memoria y exportación StateTree.
+
+### C. Fases Fundacionales y de Especialización (UAF-81.0 a UAF-81.87)
+- `docs/UAF-81.0-FOUNDATION.md`: Especificación, identidades, operaciones y gobernanza de artefactos.
+- `docs/UAF-81.1-SPECIFICATION.md` a `docs/UAF-81.8-ASSEMBLY-OPTIMIZATION.md`: Generadores base de mallas, texturas PBR, rigs bípedos, modularidad y optimización LOD/Nanite.
+- `docs/UAF-81.9-` a `docs/UAF-81.79-`: Módulos especializados de fauna, ropa multicapa, armaduras, biomas naturales y lógica de juego.
+- `docs/UAF-81.80-` a `docs/UAF-81.87-`: Runtime streaming, World Partition, redes multijugador, iluminación Lumen y puente LiveLink UE5.
+
+---
+
+## 🧪 3. Suite de Verificación y Pruebas Automatizadas (`tests/`)
+
+El repositorio cuenta con **93 archivos de pruebas de aceptación** que certifican el 100% de los subsistemas sin dependencias externas:
+
+| Archivo de Prueba | Dominio Verificado | Casos de Prueba |
 | :--- | :--- | :--- |
-| [`BOSS-1-ROBOT-CONTENCION.md`](file:///E:/Darx_Proyect/docs/BOSS-1-ROBOT-CONTENCION.md) | **Robot de Contención** | Chasis bípedo pesado, pinzas hidráulicas, carga frontal y agarre de asfixia QTE. |
-| [`BOSS-2-THE-ERROR.md`](file:///E:/Darx_Proyect/docs/BOSS-2-THE-ERROR.md) | **The Error** | Entidad glitch flotante, jaula dimensional, teletransporte estroboscópico y ecos. |
-| [`BOSS-3-STATIC-MATRIX.md`](file:///E:/Darx_Proyect/docs/BOSS-3-STATIC-MATRIX.md) | **Static Matrix** | Matriz analógica CRT, desfasaje, sombras de interferencia e inversión de controles. |
-| [`BOSS-4-FLORA-CARNIVORA.md`](file:///E:/Darx_Proyect/docs/BOSS-4-FLORA-CARNIVORA.md) | **Flora Carnívora** | Huésped atrapado en raíces cuadrúpedas, mortero de esporas ácidas y cepos terrestres. |
-| [`BOSS-5-AMALGAMA-CELULAR.md`](file:///E:/Darx_Proyect/docs/BOSS-5-AMALGAMA-CELULAR.md) | **El Amalgama Celular** | Musculatura expuesta, mutación adaptativa, golpe demoledor y Fuga Metabólica. |
-| [`BOSS-6-EXPERIMENTO-TELEQUINETICO.md`](file:///E:/Darx_Proyect/docs/BOSS-6-EXPERIMENTO-TELEQUINETICO.md) | **Sujeto Cero (Telekinetic)**| Arnés de levitación, predicción de trayectoria (*lead target*), cubos cinéticos y Salva Total. |
+| [`test_acceptance_uaf81_88.py`](file:///d:/Proyectos/TEST/AssetOrchestrationEngine/tests/uaf/test_acceptance_uaf81_88.py) | Golden Vertical Slice, 7 Compuertas, Auto-reparación | 22 tests |
+| [`test_acceptance_uaf81_89.py`](file:///d:/Proyectos/TEST/AssetOrchestrationEngine/tests/uaf/test_acceptance_uaf81_89.py) | Fluidos SPH, Rayos, JIT Niagara, Audio Coupling | 20 tests |
+| [`test_acceptance_ue5_bundle.py`](file:///d:/Proyectos/TEST/AssetOrchestrationEngine/tests/uaf/test_acceptance_ue5_bundle.py) | Exportación de bundle portátil y CLI `aoe` | 5 tests |
+| [`test_acceptance_uaf81_90.py`](file:///d:/Proyectos/TEST/AssetOrchestrationEngine/tests/uaf/test_acceptance_uaf81_90.py) | WFC 2D/3D, Cero Softlocks, Misiones DAG, Pacing | 14 tests |
+| [`test_acceptance_uaf81_91.py`](file:///d:/Proyectos/TEST/AssetOrchestrationEngine/tests/uaf/test_acceptance_uaf81_91.py) | RAW 16-bit, Erosión Hidráulica/Térmica, Splines | 15 tests |
+| [`test_acceptance_uaf81_92.py`](file:///d:/Proyectos/TEST/AssetOrchestrationEngine/tests/uaf/test_acceptance_uaf81_92.py) | GOAP $A^*$, Escuadrones, Percepción, Facciones, StateTree | 15 tests |
+| `test_acceptance_uaf81_1.py` a `81_87.py` | Geometría, Texturas, Rigs, Redes, Streaming, etc. | 2400+ tests |
 
----
-
-### C. Audio, Síntesis y MetaSounds
-| Documento | Propósito y Contenido |
-| :--- | :--- |
-| [`PIPELINE-AUDIO-VITAL-ABLETON-UNREAL.md`](file:///E:/Darx_Proyect/docs/PIPELINE-AUDIO-VITAL-ABLETON-UNREAL.md) | **Pipeline Maestro de Audio**: Ableton Live MCP + Vital + Python + Unreal C++. |
-| [`GUIA-SINTESIS-VITAL-SFX.md`](file:///E:/Darx_Proyect/docs/GUIA-SINTESIS-VITAL-SFX.md) | Manual psicoacústico de síntesis modular en Vital (recetas paso a paso). |
-| [`ARQUITECTURA-MUSICA.md`](file:///E:/Darx_Proyect/docs/ARQUITECTURA-MUSICA.md) | Motor de música adaptativa por stems, Quartz Clock y MetaSounds en C++. |
-| [`FASE-10-Contrato-Sonido.md`](file:///E:/Darx_Proyect/docs/FASE-10-Contrato-Sonido.md) | Contrato de efectos de sonido y mezcla maestra. |
-| [`FASE-10.1-Contrato-Musica-Ampliada.md`](file:///E:/Darx_Proyect/docs/FASE-10.1-Contrato-Musica-Ampliada.md) | Evolución musical de 5 fases de intensidad y motivos por bioma. |
-| [`FASE-10.2-Propuesta-Nuevos-Sonidos.md`](file:///E:/Darx_Proyect/docs/FASE-10.2-Propuesta-Nuevos-Sonidos.md) | Catálogo sonoro de los 9 arquetipos de tropas y 6 Bosses. |
-| [`ASSETS-SONIDO-VITAL.md`](file:///E:/Darx_Proyect/docs/ASSETS-SONIDO-VITAL.md) y [`ASSETS-SONIDO.md`](file:///E:/Darx_Proyect/docs/ASSETS-SONIDO.md) | Registro de patches exportados e importados al motor. |
-
----
-
-### D. Efectos Visuales, Renderizado e Iluminación
-| Documento | Contenido Técnico |
-| :--- | :--- |
-| [`VFX-NIAGARA-SUITE-CATALOGO.md`](file:///E:/Darx_Proyect/docs/VFX-NIAGARA-SUITE-CATALOGO.md) | **Catálogo de 20 Sistemas Niagara**: Parámetros, emisores base y asignación en C++. |
-| [`CALIBRACION-ILUMINACION-Y-LEDS.md`](file:///E:/Darx_Proyect/docs/CALIBRACION-ILUMINACION-Y-LEDS.md) | Auto-Exposición Adaptativa (`AEM_Histogram`), luz táctica y controles en vivo de LEDs. |
-| [`FASE-12-Suite-RTX-DLSS-RayReconstruction.md`](file:///E:/Darx_Proyect/docs/FASE-12-Suite-RTX-DLSS-RayReconstruction.md) | NVIDIA DLSS Super Resolution, Frame Generation, Ray Reconstruction y Reflex. |
-
----
-
-### E. Arquitectura del Motor, WorldGen, IA y Asset Engine
-| [`ASSET-ORCHESTRATION-ENGINE-MASTER.md`](file:///E:/Darx_Proyect/docs/ASSET-ORCHESTRATION-ENGINE-MASTER.md) | **Documento Maestro del Asset Orchestration Engine (AOE)**: Fases 1 a 80 completadas (**1382 tests PASS**), orquestación de producción end-to-end (`ProductionOrchestratorAPI`), optimizador multiobjetivo de coste/rendimiento (`CostPerformanceAPI`), aprendizaje y optimización de estrategias (`StrategyLearningAPI`), análisis de fallos y self-debugging (`DiagnosticsAPI`), biblioteca oficial Golden Assets & Baselines (`GoldenAPI`), benchmark cuantitativo (`EvaluationBenchmarkAPI`), grafo de conocimiento (`ProjectKnowledgeGraphAPI`), memoria contextual (`ContextMemoryAPI`), contratos V2 y ToolGuard, persistencia y recuperación ante caídas, cumplimiento de la Regla 52 y hoja de ruta completa (Fases 81 a 84 + Auditoría Final). |
-| [`F80-PRODUCTION-ORCHESTRATION-VALIDATION.md`](file:///E:/Darx_Proyect/docs/F80-PRODUCTION-ORCHESTRATION-VALIDATION.md) | **Informe de Validación Oficial Fase 80 (Production Orchestration)**: Pipeline end-to-end de 19 etapas, 17 estados, máquina de estados atómica, resiliencia F70, gobernanza F71/F72, validación real en Blender de `DARX Production Test Weapon`, cero duplicación y preservación estricta de `DarX_Assets.blend`. |
-| [`FASE-11-Contrato-Generacion-Procedural.md`](file:///E:/Darx_Proyect/docs/FASE-11-Contrato-Generacion-Procedural.md) | Generador de mundo procedural de 3 biomas, esclusas y arenas de combate. |
-| [`ARQUITECTURA-DIRECTOR-Y-PERSISTENCIA.md`](file:///E:/Darx_Proyect/docs/ARQUITECTURA-DIRECTOR-Y-PERSISTENCIA.md) | Director de IA multiclase, tabla de spawn ponderada y guardado por semilla. |
-| [`FASE-9-AnimBP-Especificacion.md`](file:///E:/Darx_Proyect/docs/FASE-9-AnimBP-Especificacion.md) | Animation Blueprint del jugador en primera persona. |
-| [`FASE-9-Contrato.md`](file:///E:/Darx_Proyect/docs/FASE-9-Contrato.md) | Contrato de integración del chasis del jugador. |
-| [`FASE-1-Analisis-Tecnico.md`](file:///E:/Darx_Proyect/docs/FASE-1-Analisis-Tecnico.md) a [`FASE-2-Especificacion-Tecnica.md`](file:///E:/Darx_Proyect/docs/FASE-2-Especificacion-Tecnica.md) | Especificaciones base del mundo cúbico y movilidad. |
-
----
-
-## 🛠️ 2. Scripts de Automatización y Pipelines (`Art/`)
-
-| Script | Propósito y Comportamiento Atómico |
-| :--- | :--- |
-| `Art/Blender/rehacer_todo.py` | Reconstruye y exporta todas las mallas y rigs de Blender a FBX sin abrir la UI. |
-| `Art/crear_master_materials_reales.py` | Instancia y compila los 16 Master Materials PBR con soporte Nanite/ISM. |
-| `Art/calibrar_todos_los_materiales.py` | Calibra intensidades emisivas LED en todos los materiales del proyecto. |
-| `Art/VFX/crear_suite_completa_niagara.py`| Instancia los 20 emisores de partículas Niagara en `/Game/DarX/VFX/`. |
-| `Art/VFX/render_all_boss_and_mob_vfx.py` | Renderiza previsualizaciones gráficas de VFX en Blender. |
-| `Art/Tests/test_suite_darx.py` | **Suite de 21 Pruebas Automatizadas** en Unreal Engine (100% de cobertura). |
-| `compilar.ps1` | Compilador acelerado de C++ con UnrealBuildTool (`-Esperar`, `-Archivo`). |
-| `ejecutar_tests.ps1` | Ejecutor desatendido de compilación y pruebas automatizadas. |
-
----
-
-## 📌 3. Reglas de Oro Inflexibles (Resumen de `REGLAS-DE-TRABAJO.md`)
-
-1. **Mide, no supongas (Regla 0 y 8)**: Ante cualquier anomalía, ejecutar scripts diagnósticos de lectura (`.py` / logs) antes de modificar código.
-2. **Unicidad Visual Absoluta (Regla 3)**: Prohibido reciclar modelos entre Bosses y tropas.
-3. **Previsualización Visual Obligatoria (Regla 4)**: Renderizar capturas antes de exportar a Unreal.
-4. **Zero-Self-Collision y Buffer $\ge 30\text{ cm}$ (Regla 5)**: Accesorios y escudos separados del cuerpo para evitar clipping y colisiones internas.
-5. **Sesión Centralizada de Ableton Live (Regla 6)**: Toda producción musical y de SFX reside en una única sesión organizada.
-6. **Espacialización 3D Obligatoria (Regla 10)**: Todo sonido de enemigo o proyectil debe tener origen espacial y curva de caída $\le 18-20\text{ m}$.
-7. **Pausa Obligatoria en Menús de Debug (Regla 9)**: Pausar el juego al abrir herramientas de inspección.
-8. **Auto-Exposición Adaptativa y Vanos Libres (Reglas 44-46)**: Mantener vanos de paso abiertos entre salas y auto-exposición `AEM_Histogram` activa.
+**Comando de ejecución global:**
+```powershell
+$env:PYTHONPATH='src'; py -3.13 -m pytest tests/uaf/test_acceptance_*.py -q
+```
+*Resultado actual: 100% de tests aprobados sin fallos ni advertencias.*
