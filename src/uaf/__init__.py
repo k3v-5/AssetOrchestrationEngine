@@ -1938,6 +1938,30 @@ from .universal_scene import (
     UniversalSceneValidator,
     UniversalScenePackager,
 )
+# Universal Runtime World Model System (UAF-81.73)
+from .runtime_world import (
+    WorldState,
+    EntityLifecycleState,
+    ComponentLifecycleState,
+    SystemPhase,
+    StreamingState,
+    ResourceState,
+    EventPriority,
+    RuntimeTransform,
+    RuntimeComponent,
+    RuntimeEntity,
+    RuntimeSystem,
+    RuntimeEvent,
+    EventSubscription,
+    RuntimeResource,
+    StreamingCell,
+    RuntimeWorld,
+    WorldStateSnapshot,
+    UniversalRuntimeWorldFabricator,
+    UniversalRuntimeWorldValidator,
+    UniversalRuntimeWorldPackager,
+)
+
 
 
 
@@ -3638,6 +3662,27 @@ __all__ = [
     "UniversalSceneFabricator",
     "UniversalSceneValidator",
     "UniversalScenePackager",
+    # Universal Runtime World Model System (UAF-81.73)
+    "WorldState",
+    "EntityLifecycleState",
+    "ComponentLifecycleState",
+    "SystemPhase",
+    "StreamingState",
+    "ResourceState",
+    "EventPriority",
+    "RuntimeTransform",
+    "RuntimeComponent",
+    "RuntimeEntity",
+    "RuntimeSystem",
+    "RuntimeEvent",
+    "EventSubscription",
+    "RuntimeResource",
+    "StreamingCell",
+    "RuntimeWorld",
+    "WorldStateSnapshot",
+    "UniversalRuntimeWorldFabricator",
+    "UniversalRuntimeWorldValidator",
+    "UniversalRuntimeWorldPackager",
 ]
 
 
