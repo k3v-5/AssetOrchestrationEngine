@@ -91,7 +91,7 @@ src/
 ### A. Guías de Integración y Flujo de Trabajo
 - [`docs/UAF-NEXTGEN-ARCHITECTURE-GUIDE.md`](file:///d:/Proyectos/TEST/AssetOrchestrationEngine/docs/UAF-NEXTGEN-ARCHITECTURE-GUIDE.md): **Guía maestra de la arquitectura Next-Gen** (Fases 81.88 a 81.92 integradas).
 - [`docs/UE5-PORTABLE-WORKFLOW-GUIDE.md`](file:///d:/Proyectos/TEST/AssetOrchestrationEngine/docs/UE5-PORTABLE-WORKFLOW-GUIDE.md): Manual paso a paso para transferir assets a cualquier PC con Unreal Engine 5 sin dependencias locales.
-- [`docs/UAF-ROADMAP-PENDIENTES-BACKLOG.md`](file:///d:/Proyectos/TEST/AssetOrchestrationEngine/docs/UAF-ROADMAP-PENDIENTES-BACKLOG.md): Registro de fases pendientes (Economía/Loot GAS, MetaSounds, LiveLink bidireccional, QA Playtesting).
+- [`docs/UAF-ROADMAP-PENDIENTES-BACKLOG.md`](file:///d:/Proyectos/TEST/AssetOrchestrationEngine/docs/UAF-ROADMAP-PENDIENTES-BACKLOG.md): Registro de fases pendientes (UAF-81.93 a UAF-81.102: Economía/Loot, MetaSounds, LiveLink, QA Playtesting, Cinemáticas Sequencer, Narrativa/Diálogos, Destrucción Chaos, Clima Volumétrico, Studio Web UI, Vertical Slice Master Builder).
 
 ### B. Especificaciones Normativas de Fases Estratégicas Recientes
 - [`docs/UAF-81.88-GOLDEN-VERTICAL-SLICE-SPEC.md`](file:///d:/Proyectos/TEST/AssetOrchestrationEngine/docs/UAF-81.88-GOLDEN-VERTICAL-SLICE-SPEC.md): Certificación autónoma, compuertas de calidad y empaquetado de builds reproducibles.

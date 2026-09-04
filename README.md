@@ -17,7 +17,7 @@
 | 📚 **[docs/INDICE-CONOCIMIENTO.md](docs/INDICE-CONOCIMIENTO.md)** | **Master Knowledge Index** — Complete catalog of all 110+ specs, modules, and 93 acceptance test suites. |
 | 🏗️ **[docs/UAF-NEXTGEN-ARCHITECTURE-GUIDE.md](docs/UAF-NEXTGEN-ARCHITECTURE-GUIDE.md)** | **Next-Gen Architecture Guide** — End-to-end integration: Macro-Landscape, WFC Levels, GOAP AI Squads, and UE5 Bundling. |
 | 📦 **[docs/UE5-PORTABLE-WORKFLOW-GUIDE.md](docs/UE5-PORTABLE-WORKFLOW-GUIDE.md)** | **UE5 Portable Workflow Guide** — Offline/air-gapped asset bundle generation, headless ingestion, and runtime deployment. |
-| 🔮 **[docs/UAF-ROADMAP-PENDIENTES-BACKLOG.md](docs/UAF-ROADMAP-PENDIENTES-BACKLOG.md)** | **Strategic Backlog & Roadmap** — Planned future phases (UAF-81.93 to UAF-81.96: Economy, Audio, LiveLink, Playtesting). |
+| 🔮 **[docs/UAF-ROADMAP-PENDIENTES-BACKLOG.md](docs/UAF-ROADMAP-PENDIENTES-BACKLOG.md)** | **Strategic Backlog & Roadmap** — Planned future phases (UAF-81.93 to UAF-81.102: Economy, Audio, LiveLink, Playtesting, Sequencer, Chaos, Web UI, Slice Builder). |
 | 🎮 **[docs/DARX-PRODUCTION-CASE-STUDY.md](docs/DARX-PRODUCTION-CASE-STUDY.md)** | **DarX AAA Production Case Study** — 16 character & boss before-vs-after showcases. |
 
 ---
