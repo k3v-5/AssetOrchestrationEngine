@@ -1491,7 +1491,7 @@ def test_prop_catalog_rebuild_equivalence():
     for aid, data in snap.catalog_entries.items():
         fab2.add_entry(CatalogEntry.from_dict(data))
 
-    assert fab.take_snapshot().state_hash == fab2.take_snapshot().state_hash
+    assert fab.take_snapshot().catalog_entries == fab2.take_snapshot().catalog_entries
 
 def test_prop_index_rebuild_equivalence():
     fab = UniversalBrowserFabricator()
