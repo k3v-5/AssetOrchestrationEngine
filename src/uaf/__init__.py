@@ -1961,6 +1961,36 @@ from .runtime_world import (
     UniversalRuntimeWorldValidator,
     UniversalRuntimeWorldPackager,
 )
+# Universal Runtime Physics, Collision World, Rigid Bodies & Simulation System (UAF-81.74)
+from .runtime_physics import (
+    PhysicsWorldState,
+    BodyType,
+    CollisionShapeType,
+    MaterialCombinePolicy,
+    ConstraintType,
+    PhysicsEventType,
+    PhysicsMaterial,
+    CollisionShape,
+    Collider,
+    PhysicsBody,
+    PhysicsConstraint,
+    CharacterController,
+    ContactPoint,
+    ContactManifold,
+    RaycastHit,
+    OverlapHit,
+    SweepHit,
+    PhysicsEvent,
+    PhysicsSimulationSettings,
+    PhysicsWorld,
+    PhysicsSnapshot,
+    PhysicsReplayCommand,
+    PhysicsReplay,
+    UniversalRuntimePhysicsFabricator,
+    UniversalRuntimePhysicsValidator,
+    UniversalRuntimePhysicsPackager,
+)
+
 
 
 
@@ -3683,6 +3713,33 @@ __all__ = [
     "UniversalRuntimeWorldFabricator",
     "UniversalRuntimeWorldValidator",
     "UniversalRuntimeWorldPackager",
+    # Universal Runtime Physics System (UAF-81.74)
+    "PhysicsWorldState",
+    "BodyType",
+    "CollisionShapeType",
+    "MaterialCombinePolicy",
+    "ConstraintType",
+    "PhysicsEventType",
+    "PhysicsMaterial",
+    "CollisionShape",
+    "Collider",
+    "PhysicsBody",
+    "PhysicsConstraint",
+    "CharacterController",
+    "ContactPoint",
+    "ContactManifold",
+    "RaycastHit",
+    "OverlapHit",
+    "SweepHit",
+    "PhysicsEvent",
+    "PhysicsSimulationSettings",
+    "PhysicsWorld",
+    "PhysicsSnapshot",
+    "PhysicsReplayCommand",
+    "PhysicsReplay",
+    "UniversalRuntimePhysicsFabricator",
+    "UniversalRuntimePhysicsValidator",
+    "UniversalRuntimePhysicsPackager",
 ]
 
 
