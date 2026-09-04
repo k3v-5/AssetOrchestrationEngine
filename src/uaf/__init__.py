@@ -3020,6 +3020,30 @@ from .landscape import (
     UE5LandscapeExporter,
 )
 
+# Advanced Multi-Agent NPC Ecosystem, Cognitive GOAP & Squad Tactics (UAF-81.92)
+from .ai import (
+    FactionId,
+    DispositionType,
+    TacticalRole,
+    StimulusType,
+    PerceptionStimulus,
+    WorldState,
+    GOAPAction,
+    GOAPGoal,
+    GOAPPlan,
+    GOAPPlanner,
+    SquadMember,
+    SquadBlackboard,
+    Squad,
+    TrackedThreat,
+    PerceptionSensor,
+    FactionReputationMatrix,
+    StateTreeTaskSchema,
+    StateTreeNodeSchema,
+    UE5StateTreeManifest,
+    UE5AIExporter,
+)
+
 __all__ = [
     "ProjectContext",
     "ExecutionContext",
@@ -5521,6 +5545,26 @@ __all__ = [
     "PCGFoliageDistributor",
     "UE5LandscapeManifest",
     "UE5LandscapeExporter",
+    "FactionId",
+    "DispositionType",
+    "TacticalRole",
+    "StimulusType",
+    "PerceptionStimulus",
+    "WorldState",
+    "GOAPAction",
+    "GOAPGoal",
+    "GOAPPlan",
+    "GOAPPlanner",
+    "SquadMember",
+    "SquadBlackboard",
+    "Squad",
+    "TrackedThreat",
+    "PerceptionSensor",
+    "FactionReputationMatrix",
+    "StateTreeTaskSchema",
+    "StateTreeNodeSchema",
+    "UE5StateTreeManifest",
+    "UE5AIExporter",
 ]
 
 
