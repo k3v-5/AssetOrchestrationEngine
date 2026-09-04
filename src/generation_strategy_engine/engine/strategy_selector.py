@@ -11,6 +11,9 @@ from ..registry.strategy_registry import GenerationStrategyRegistry
 from ..analyzers.complexity_analyzer import AssetComplexityAnalyzer
 from ..analyzers.reuse_analyzer import ReuseAnalyzer
 
+# Helper tuple alias
+Tuple_StrategyDecision = Any
+
 class StrategySelector:
     def __init__(self):
         self.registry = GenerationStrategyRegistry()

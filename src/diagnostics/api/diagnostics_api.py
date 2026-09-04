@@ -21,7 +21,8 @@ from ..integration.governance_bridge import GovernanceBridge
 from ..integration.evaluation_bridge import EvaluationBridge
 from ..integration.golden_bridge import GoldenBridge
 from ..integration.knowledge_graph_bridge import DiagnosticsKnowledgeGraphBridge
-from ...evaluation import EvaluationBenchmark
+from ...evaluation import EvaluationBenchmarkAPI, EvaluationBenchmark
+from ...golden import GoldenAPI
 
 class DiagnosticsAPI:
     """

@@ -38,8 +38,9 @@ class BlenderExecutionAgent(Agent):
             "materials_applied": [m.get("name") for m in surf.get("materials", [])],
             "collision_created": "UCX_WP_Vandal_01",
             "preview_rendered": True,
-            "preview_path": f"E:/Darx_Proyect/Saved/F70_Validation_Workspace/preview_{context.asset_id}.png"
+            "preview_path": f"./Saved/Validation_Workspace/preview_{context.asset_id}.png"
         }
+
         
         mutation = AssetMutation(
             asset_id=context.asset_id,

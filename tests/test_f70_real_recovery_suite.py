@@ -12,8 +12,11 @@ from src.long_running_job_recovery import (
     ErrorCategory, RecoveryAction, JobError, JobCheckpoint
 )
 
+import tempfile
+
 class TestF70RealRecoveryEmpiricalSuite(unittest.TestCase):
-    STORAGE_DIR = r"E:\Darx_Proyect\Saved\F70_Validation_Workspace"
+    STORAGE_DIR = os.path.join(tempfile.gettempdir(), "AOE_F70_Validation_Workspace")
+
 
     def setUp(self):
         # Reset storage directory for fresh run

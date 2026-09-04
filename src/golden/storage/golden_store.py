@@ -4,11 +4,13 @@ import threading
 from typing import Dict, Any, Optional, List
 from ..core.golden_models import GoldenAsset
 from ..core.golden_types import GoldenAssetStatus, GoldenImmutabilityError, GoldenIntegrityError
+from ...core.storage_paths import get_default_storage_path
 
 class GoldenStore:
     """Thread-safe, verifiable, and transactional persistent storage for Golden Assets."""
     def __init__(self, persistence_path: Optional[str] = None):
-        self.persistence_path = persistence_path or r"E:\Darx_Proyect\Saved\GoldenAssets\darx_golden_master_store.json"
+        self.persistence_path = persistence_path or get_default_storage_path("GoldenAssets", "golden_master_store.json")
+
         self._lock = threading.RLock()
         self._golden_assets: Dict[str, GoldenAsset] = {}
         self._backup_state: Optional[Dict[str, Any]] = None

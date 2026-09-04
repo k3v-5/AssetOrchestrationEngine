@@ -13,12 +13,16 @@ class BenchmarkFinalizedImmutableError(Exception):
     """Raised when attempting to modify a finalized/immutable benchmark."""
     pass
 
+from ...core.storage_paths import get_default_storage_path
+
+
 class EvaluationStore:
     """Persistent and verifiable storage for EvaluationBenchmark records."""
     def __init__(self, persistence_path: Optional[str] = None):
         self._benchmarks: Dict[str, EvaluationBenchmark] = {}
         self._lock = threading.RLock()
-        self.persistence_path = persistence_path or r"E:\Darx_Proyect\Saved\Evaluation\darx_benchmarks.json"
+        self.persistence_path = persistence_path or get_default_storage_path("Evaluation", "benchmarks.json")
+
 
         if self.persistence_path and os.path.exists(self.persistence_path):
             self.load_from_disk()

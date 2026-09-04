@@ -38,9 +38,10 @@ class PackagingAgent(Agent):
             "receipt": {
                 "receipt_id": receipt_id,
                 "status": "DELIVERY_VERIFIED",
-                "destination": "E:/Darx_Proyect/Saved/Bundles/Weapons",
+                "destination": "./Saved/Bundles/Weapons",
                 "transferred_files": 3,
                 "verified_hash_match": True
+
             }
         }
         

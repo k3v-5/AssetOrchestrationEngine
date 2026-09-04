@@ -3,12 +3,14 @@ import json
 import threading
 from typing import Dict, Any, List, Optional
 from .audit_trail import AuditRecord
+from ...core.storage_paths import get_default_storage_path
 
 class CostPerformanceStore:
     """Thread-safe transactional JSON store for optimization plans and audit records."""
 
     def __init__(self, persistence_path: Optional[str] = None):
-        self.persistence_path = persistence_path or r"E:\Darx_Proyect\Saved\CostPerformance\darx_cost_performance_store.json"
+        self.persistence_path = persistence_path or get_default_storage_path("CostPerformance", "cost_performance_store.json")
+
         self._plans: Dict[str, Dict[str, Any]] = {}
         self._audit_records: List[AuditRecord] = []
         self._lock = threading.RLock()

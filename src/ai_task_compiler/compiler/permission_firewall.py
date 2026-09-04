@@ -1,4 +1,4 @@
-from typing import List, Set
+from typing import List, Set, Tuple
 from ..core.task_types import TaskPermissionType, TaskRiskLevel, SemanticOperation, TaskAction
 from ..core.task_schema import TaskEnvelope
 

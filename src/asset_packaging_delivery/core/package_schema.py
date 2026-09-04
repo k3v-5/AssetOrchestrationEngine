@@ -28,8 +28,9 @@ class PackageProfile:
 class DeliveryTarget:
     target_id: str = "TARGET_LOCAL"
     target_type: DeliveryTargetType = DeliveryTargetType.LOCAL_DIRECTORY
-    destination_path: str = "E:/Darx_Proyect/Saved/Packages"
+    destination_path: str = "./Saved/Packages"
     overwrite_policy: OverwritePolicy = OverwritePolicy.OVERWRITE
+
 
 @dataclass
 class PackageFileEntry:

@@ -1,4 +1,5 @@
 import time
+import uuid
 from typing import Dict, Any, List, Optional
 from ..core.evaluation_types import (
     EvaluationDimension, DefectSeverity, DefectStatus, BenchmarkStatus, AcceptanceDecision
@@ -64,7 +65,7 @@ class EvaluationBenchmarkAPI:
         job_id: Optional[str] = None,
         agent_id: Optional[str] = "agent.visual.critic"
     ) -> EvaluationBenchmark:
-        b_id = benchmark_id or f"BENCH_{int(time.time()*1000)%100000}"
+        b_id = benchmark_id or f"BENCH_{int(time.time()*1000)%100000}_{uuid.uuid4().hex[:6]}"
         profile = self.profiles.get_profile(profile_id) or create_weapon_profile()
 
         dim_scores = DimensionEvaluator.evaluate_all(asset_data, profile.minimum_dimension_scores, reference_data)

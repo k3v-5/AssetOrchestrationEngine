@@ -4,12 +4,14 @@ import threading
 from typing import Dict, Any, List, Optional
 from ..core.strategy_models import StrategyRecord
 from ..core.learning_models import StrategyOutcome, LearningEvent, StrategyOptimizationProfile
+from ...core.storage_paths import get_default_storage_path
 
 class StrategyLearningStore:
     """Thread-safe transactional JSON persistence for strategies, outcomes, and profiles."""
 
     def __init__(self, persistence_path: Optional[str] = None):
-        self.persistence_path = persistence_path or r"E:\Darx_Proyect\Saved\StrategyLearning\darx_strategy_learning_store.json"
+        self.persistence_path = persistence_path or get_default_storage_path("StrategyLearning", "strategy_learning_store.json")
+
         self._strategies: Dict[str, StrategyRecord] = {}
         self._outcomes: List[StrategyOutcome] = []
         self._events: List[LearningEvent] = []

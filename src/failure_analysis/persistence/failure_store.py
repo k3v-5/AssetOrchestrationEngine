@@ -3,12 +3,14 @@ import json
 import threading
 from typing import Dict, Any, List, Optional
 from ..core.failure_models import FailureRecord
+from ...core.storage_paths import get_default_storage_path
 
 class FailureStore:
     """Thread-safe transactional JSON store for persistent FailureRecord instances."""
 
     def __init__(self, persistence_path: Optional[str] = None):
-        self.persistence_path = persistence_path or r"E:\Darx_Proyect\Saved\FailureAnalysis\darx_failure_store.json"
+        self.persistence_path = persistence_path or get_default_storage_path("FailureAnalysis", "failure_store.json")
+
         self._failures: Dict[str, FailureRecord] = {}
         self._lock = threading.RLock()
         self.load_from_disk()

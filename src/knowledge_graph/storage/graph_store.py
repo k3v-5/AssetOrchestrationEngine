@@ -8,6 +8,9 @@ from ..nodes.node_types import NodeType
 from ..edges.graph_edge import GraphEdge
 from ..edges.edge_types import RelationshipType
 
+from ...core.storage_paths import get_default_storage_path
+
+
 class DuplicateSemanticIdentityError(Exception):
     """Raised when an asset with duplicate primary semantic_id is registered."""
     pass
@@ -21,7 +24,8 @@ class ProjectKnowledgeGraphStore:
         self._edges: Dict[str, GraphEdge] = {}
         self._semantic_index: Dict[str, str] = {} # semantic_id -> node_id
         self._lock = threading.RLock()
-        self.persistence_path = persistence_path or r"E:\Darx_Proyect\Saved\KnowledgeGraph\darx_knowledge_graph.json"
+        self.persistence_path = persistence_path or get_default_storage_path("KnowledgeGraph", "knowledge_graph.json")
+
         
         # Transaction snapshot buffers
         self._tx_nodes: Optional[Dict[str, GraphNode]] = None

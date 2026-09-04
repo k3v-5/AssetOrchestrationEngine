@@ -2,7 +2,7 @@ import hashlib
 import json
 import time
 from dataclasses import dataclass, field
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List, Optional, Tuple
 from .spec_types import ConstraintType, ValueType, UnitType, SpecStatus, ApprovalState, RequirementStatus
 
 @dataclass

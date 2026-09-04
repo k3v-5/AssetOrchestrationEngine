@@ -1,5 +1,5 @@
 import time
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List, Optional, Tuple
 from ..core.orchestrator_schema import Checkpoint, TaskState
 
 class CheckpointManager:

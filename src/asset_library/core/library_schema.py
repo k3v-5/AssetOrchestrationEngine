@@ -1,6 +1,8 @@
 from dataclasses import dataclass, field
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List, Optional, Tuple
 from enum import Enum
+
+Tuple_3 = Tuple[float, float, float]
 
 class ParameterVisibility(str, Enum):
     PUBLIC = "PUBLIC"

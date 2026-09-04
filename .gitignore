@@ -52,3 +52,12 @@ venv.bak/
 htmlcov/
 .tox/
 .nox/
+
+# Runtime persistence & storage
+Saved/
+
+# Archives & Backups
+*.rar
+*.zip
+*.7z
+*.tar.*

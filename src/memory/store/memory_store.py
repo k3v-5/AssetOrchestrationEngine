@@ -5,6 +5,7 @@ import threading
 from typing import Dict, List, Optional, Any, Callable
 from ..core.memory_types import MemoryRecord, MemoryScope, MemoryType, MemoryStatus, MemorySource
 from ..core.exceptions import MemoryNotFoundError
+from ...core.storage_paths import get_default_storage_path
 
 class MemoryStore:
     """
@@ -15,7 +16,7 @@ class MemoryStore:
     def __init__(self, persistence_path: Optional[str] = None):
         self._records: Dict[str, MemoryRecord] = {}
         self._lock = threading.RLock()
-        self.persistence_path = persistence_path or r"E:\Darx_Proyect\Saved\MemoryStore\darx_memory_store.json"
+        self.persistence_path = persistence_path or get_default_storage_path("MemoryStore", "memory_store.json")
         
         # Load from disk if file exists
         if self.persistence_path and os.path.exists(self.persistence_path):

@@ -1,5 +1,5 @@
 import time
-from typing import Dict, Any, List, Optional, Set
+from typing import Dict, Any, List, Optional, Set, Tuple
 from ..core.orchestrator_types import TaskState, LockType
 from ..core.orchestrator_schema import Task
 

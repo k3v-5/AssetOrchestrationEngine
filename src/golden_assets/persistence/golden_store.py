@@ -7,11 +7,13 @@ from ..models.reference_asset import ReferenceAsset
 from ..models.golden_baseline import GoldenBaseline
 from ..core.golden_exceptions import GoldenIntegrityError, GoldenImmutableError
 from ..core.golden_types import GoldenStatus
+from ...core.storage_paths import get_default_storage_path
 
 class GoldenAssetStore:
     """Thread-safe and verifiable persistent storage for Golden Assets, Baselines, and References."""
     def __init__(self, persistence_path: Optional[str] = None):
-        self.persistence_path = persistence_path or r"E:\Darx_Proyect\Saved\GoldenAssets\darx_golden_assets.json"
+        self.persistence_path = persistence_path or get_default_storage_path("GoldenAssets", "golden_assets.json")
+
         self._lock = threading.RLock()
         self._golden_assets: Dict[str, GoldenAsset] = {}
         self._references: Dict[str, ReferenceAsset] = {}
