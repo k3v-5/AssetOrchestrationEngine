@@ -1848,6 +1848,36 @@ from .universal_browser import (
     UniversalBrowserPackager,
 )
 
+# Universal Asset Import Pipeline System (UAF-81.70)
+from .universal_import import (
+    SourceType,
+    FormatCategory,
+    JobState,
+    JobPriority,
+    WorkerState,
+    ArtifactType,
+    OutputPolicy,
+    normalize_source_path,
+    FormatDescriptor,
+    ImportSettings,
+    ImportProfile,
+    ProcessingEdge,
+    ProcessingNode,
+    ProcessingGraph,
+    ImportArtifact,
+    ImportJob,
+    ImportManifest,
+    ImportTelemetry,
+    ImportStateSnapshot,
+    ImportDiagnosticBundle,
+    ImportSourceIdentity,
+    ImportJobState,
+    ImportJobPriority,
+    UniversalImportFabricator,
+    UniversalImportValidator,
+    UniversalImportPackager,
+)
+
 
 
 
@@ -3461,6 +3491,33 @@ __all__ = [
     "UniversalBrowserFabricator",
     "UniversalBrowserValidator",
     "UniversalBrowserPackager",
+    # Universal Asset Import Pipeline System (UAF-81.70)
+    "SourceType",
+    "FormatCategory",
+    "JobState",
+    "JobPriority",
+    "WorkerState",
+    "ArtifactType",
+    "OutputPolicy",
+    "normalize_source_path",
+    "FormatDescriptor",
+    "ImportSettings",
+    "ImportProfile",
+    "ProcessingEdge",
+    "ProcessingNode",
+    "ProcessingGraph",
+    "ImportArtifact",
+    "ImportJob",
+    "ImportManifest",
+    "ImportTelemetry",
+    "ImportStateSnapshot",
+    "ImportDiagnosticBundle",
+    "ImportSourceIdentity",
+    "ImportJobState",
+    "ImportJobPriority",
+    "UniversalImportFabricator",
+    "UniversalImportValidator",
+    "UniversalImportPackager",
 ]
 
 
