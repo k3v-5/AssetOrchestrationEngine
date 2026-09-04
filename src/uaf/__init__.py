@@ -2015,6 +2015,42 @@ from .runtime_rendering import (
     UniversalRuntimeRenderingPackager,
 )
 
+# Universal Runtime Audio World System (UAF-81.76)
+from .runtime_audio import (
+    AudioWorldState,
+    AudioDeviceState,
+    AudioSourceState,
+    AudioSourceType,
+    AudioDistanceModel,
+    VoiceStealingPolicy,
+    VoiceState,
+    LoopMode,
+    AudioCommandType,
+    AudioEventType,
+    AudioEffectType,
+    AudioClip,
+    AudioStream,
+    AudioDevice,
+    AudioEffect,
+    AudioBus,
+    AudioVoice,
+    AudioSource,
+    AudioListener,
+    AudioCommand,
+    AudioEvent,
+    AudioSnapshot,
+    AudioReplayCommand,
+    AudioReplay,
+    AudioMixer,
+    AudioWorldSettings,
+    AudioWorld,
+    UniversalRuntimeAudioFabricator,
+    AudioValidationIssue,
+    UniversalRuntimeAudioValidator,
+    UniversalRuntimeAudioPackager,
+)
+
+
 
 
 
@@ -3787,6 +3823,38 @@ __all__ = [
     "UniversalRuntimeRenderingFabricator",
     "UniversalRuntimeRenderingValidator",
     "UniversalRuntimeRenderingPackager",
+    # Universal Runtime Audio World System (UAF-81.76)
+    "AudioWorldState",
+    "AudioDeviceState",
+    "AudioSourceState",
+    "AudioSourceType",
+    "AudioDistanceModel",
+    "VoiceStealingPolicy",
+    "VoiceState",
+    "LoopMode",
+    "AudioCommandType",
+    "AudioEventType",
+    "AudioEffectType",
+    "AudioClip",
+    "AudioStream",
+    "AudioDevice",
+    "AudioEffect",
+    "AudioBus",
+    "AudioVoice",
+    "AudioSource",
+    "AudioListener",
+    "AudioCommand",
+    "AudioEvent",
+    "AudioSnapshot",
+    "AudioReplayCommand",
+    "AudioReplay",
+    "AudioMixer",
+    "AudioWorldSettings",
+    "AudioWorld",
+    "UniversalRuntimeAudioFabricator",
+    "AudioValidationIssue",
+    "UniversalRuntimeAudioValidator",
+    "UniversalRuntimeAudioPackager",
 ]
 
 
