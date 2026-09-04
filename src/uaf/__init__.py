@@ -2993,6 +2993,33 @@ from .level_design import (
     UE5LevelExporter,
 )
 
+# Universal Procedural Macro-Landscape, Hydraulic Erosion & Spline Infrastructure (UAF-81.91)
+from .landscape import (
+    BiomeType,
+    RoadCategory,
+    SplineNode,
+    RoadPath,
+    ClimateMap,
+    TerrainLayerWeightmaps,
+    Heightfield2D,
+    PerlinNoise2D,
+    FractalNoise2D,
+    VoronoiCellularNoise2D,
+    MacroTerrainGenerator,
+    HydraulicErosionSimulator,
+    ThermalErosionSimulator,
+    ClimateModeler,
+    WhittakerBiomeClassifier,
+    TerrainWeightmapGenerator,
+    RiverDrainageNetwork,
+    RoadNetworkPlanner,
+    FoliageInstance,
+    PoissonDiskSampler2D,
+    PCGFoliageDistributor,
+    UE5LandscapeManifest,
+    UE5LandscapeExporter,
+)
+
 __all__ = [
     "ProjectContext",
     "ExecutionContext",
@@ -5471,6 +5498,29 @@ __all__ = [
     "UE5ActorInstance",
     "UE5LevelManifest",
     "UE5LevelExporter",
+    "BiomeType",
+    "RoadCategory",
+    "SplineNode",
+    "RoadPath",
+    "ClimateMap",
+    "TerrainLayerWeightmaps",
+    "Heightfield2D",
+    "PerlinNoise2D",
+    "FractalNoise2D",
+    "VoronoiCellularNoise2D",
+    "MacroTerrainGenerator",
+    "HydraulicErosionSimulator",
+    "ThermalErosionSimulator",
+    "ClimateModeler",
+    "WhittakerBiomeClassifier",
+    "TerrainWeightmapGenerator",
+    "RiverDrainageNetwork",
+    "RoadNetworkPlanner",
+    "FoliageInstance",
+    "PoissonDiskSampler2D",
+    "PCGFoliageDistributor",
+    "UE5LandscapeManifest",
+    "UE5LandscapeExporter",
 ]
 
 
