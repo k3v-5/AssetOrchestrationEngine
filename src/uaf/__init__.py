@@ -1819,6 +1819,35 @@ from .universal_inspector import (
     UniversalInspectorPackager,
 )
 
+# Universal Asset Browser & Resource Catalog System (UAF-81.69)
+from .universal_browser import (
+    CatalogEntryState,
+    ImportStatus,
+    BrowserViewMode,
+    SortField,
+    SortDirection,
+    CollectionType,
+    PreviewMode,
+    AssetHealth,
+    normalize_catalog_path,
+    SearchQuery,
+    SearchResult,
+    AssetTag,
+    AssetCollection,
+    ThumbnailItem,
+    PreviewItem,
+    BrowserSelection,
+    BrowserStateSnapshot,
+    BrowserTelemetry,
+    BrowserDiagnosticBundle,
+    BrowserAssetIdentity,
+    BrowserCatalogEntry,
+    BrowserAssetMetadata,
+    UniversalBrowserFabricator,
+    UniversalBrowserValidator,
+    UniversalBrowserPackager,
+)
+
 
 
 
@@ -3406,6 +3435,32 @@ __all__ = [
     "UniversalInspectorFabricator",
     "UniversalInspectorValidator",
     "UniversalInspectorPackager",
+    # Universal Asset Browser & Resource Catalog System (UAF-81.69)
+    "CatalogEntryState",
+    "ImportStatus",
+    "BrowserViewMode",
+    "SortField",
+    "SortDirection",
+    "CollectionType",
+    "PreviewMode",
+    "AssetHealth",
+    "normalize_catalog_path",
+    "SearchQuery",
+    "SearchResult",
+    "AssetTag",
+    "AssetCollection",
+    "ThumbnailItem",
+    "PreviewItem",
+    "BrowserSelection",
+    "BrowserStateSnapshot",
+    "BrowserTelemetry",
+    "BrowserDiagnosticBundle",
+    "BrowserAssetIdentity",
+    "BrowserCatalogEntry",
+    "BrowserAssetMetadata",
+    "UniversalBrowserFabricator",
+    "UniversalBrowserValidator",
+    "UniversalBrowserPackager",
 ]
 
 
