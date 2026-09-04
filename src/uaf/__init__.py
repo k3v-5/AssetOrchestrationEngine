@@ -1990,6 +1990,31 @@ from .runtime_physics import (
     UniversalRuntimePhysicsValidator,
     UniversalRuntimePhysicsPackager,
 )
+# Universal Runtime Rendering World System (UAF-81.75)
+from .runtime_rendering import (
+    RenderWorldState,
+    CameraProjection,
+    LightType,
+    RenderQueueType,
+    SortMode,
+    BufferType,
+    RenderCamera,
+    RenderLight,
+    RenderMesh,
+    RenderMaterial,
+    RenderableEntity,
+    DrawCommand,
+    RenderPass,
+    RenderGraph,
+    GPUResource,
+    RenderFrame,
+    RenderWorldSettings,
+    RenderWorld,
+    UniversalRuntimeRenderingFabricator,
+    UniversalRuntimeRenderingValidator,
+    UniversalRuntimeRenderingPackager,
+)
+
 
 
 
@@ -3740,6 +3765,28 @@ __all__ = [
     "UniversalRuntimePhysicsFabricator",
     "UniversalRuntimePhysicsValidator",
     "UniversalRuntimePhysicsPackager",
+    # Universal Runtime Rendering World System (UAF-81.75)
+    "RenderWorldState",
+    "CameraProjection",
+    "LightType",
+    "RenderQueueType",
+    "SortMode",
+    "BufferType",
+    "RenderCamera",
+    "RenderLight",
+    "RenderMesh",
+    "RenderMaterial",
+    "RenderableEntity",
+    "DrawCommand",
+    "RenderPass",
+    "RenderGraph",
+    "GPUResource",
+    "RenderFrame",
+    "RenderWorldSettings",
+    "RenderWorld",
+    "UniversalRuntimeRenderingFabricator",
+    "UniversalRuntimeRenderingValidator",
+    "UniversalRuntimeRenderingPackager",
 ]
 
 
