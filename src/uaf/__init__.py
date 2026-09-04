@@ -1914,6 +1914,31 @@ from .universal_processing import (
     UniversalProcessingValidator,
     UniversalProcessingPackager,
 )
+# Universal Scene Assembly & Prefab System (UAF-81.72)
+from .universal_scene import (
+    ComponentType,
+    OverrideType,
+    MergeConflictResolution,
+    SceneBuildMode,
+    SceneState,
+    normalize_scene_path,
+    Transform,
+    Component,
+    Entity,
+    PrefabOverride,
+    Prefab,
+    PrefabInstance,
+    Scene,
+    SceneDiff,
+    SceneMergeResult,
+    SceneBuildArtifact,
+    SceneStateSnapshot,
+    SceneDiagnosticBundle,
+    UniversalSceneFabricator,
+    UniversalSceneValidator,
+    UniversalScenePackager,
+)
+
 
 
 
@@ -3591,6 +3616,28 @@ __all__ = [
     "UniversalProcessingFabricator",
     "UniversalProcessingValidator",
     "UniversalProcessingPackager",
+    # Universal Scene Assembly & Prefab System (UAF-81.72)
+    "ComponentType",
+    "OverrideType",
+    "MergeConflictResolution",
+    "SceneBuildMode",
+    "SceneState",
+    "normalize_scene_path",
+    "Transform",
+    "Component",
+    "Entity",
+    "PrefabOverride",
+    "Prefab",
+    "PrefabInstance",
+    "Scene",
+    "SceneDiff",
+    "SceneMergeResult",
+    "SceneBuildArtifact",
+    "SceneStateSnapshot",
+    "SceneDiagnosticBundle",
+    "UniversalSceneFabricator",
+    "UniversalSceneValidator",
+    "UniversalScenePackager",
 ]
 
 
