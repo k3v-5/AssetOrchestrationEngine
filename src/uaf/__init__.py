@@ -1618,6 +1618,39 @@ from .universal_deployment import (
     ProductionReadyDeployment,
 )
 
+# Universal Runtime Bootstrap, Application Lifecycle, Service Container & Health Monitoring (UAF-81.64)
+from .universal_runtime import (
+    RuntimeState,
+    ServiceLifecycle,
+    ServiceScope,
+    HealthState,
+    HealthCheckType,
+    ShutdownReason,
+    CrashType,
+    RestartPolicy,
+    WatchdogEscalation,
+    CapabilityStatus,
+    PreviousSessionStatus,
+    StartupPolicy,
+    ShutdownPolicy,
+    RecoveryAction,
+    RuntimeEnvironment,
+    ServiceDefinition,
+    ServiceInstance,
+    HealthCheckResult,
+    HealthReport,
+    WatchdogEvent,
+    CrashReport,
+    RuntimeTelemetry,
+    DiagnosticBundle,
+    RuntimeDiagnosticReport,
+    UniversalRuntimeFabricator,
+    UniversalRuntimeValidator,
+    UniversalRuntimePackager,
+    ProductionReadyRuntime,
+)
+
+
 
 
 
@@ -3021,6 +3054,34 @@ __all__ = [
     "DeploymentValidationReport",
     "UniversalDeploymentPackager",
     "ProductionReadyDeployment",
+    "RuntimeState",
+    "ServiceLifecycle",
+    "ServiceScope",
+    "HealthState",
+    "HealthCheckType",
+    "ShutdownReason",
+    "CrashType",
+    "RestartPolicy",
+    "WatchdogEscalation",
+    "CapabilityStatus",
+    "PreviousSessionStatus",
+    "StartupPolicy",
+    "ShutdownPolicy",
+    "RecoveryAction",
+    "RuntimeEnvironment",
+    "ServiceDefinition",
+    "ServiceInstance",
+    "HealthCheckResult",
+    "HealthReport",
+    "WatchdogEvent",
+    "CrashReport",
+    "RuntimeTelemetry",
+    "DiagnosticBundle",
+    "RuntimeDiagnosticReport",
+    "UniversalRuntimeFabricator",
+    "UniversalRuntimeValidator",
+    "UniversalRuntimePackager",
+    "ProductionReadyRuntime",
 ]
 
 
