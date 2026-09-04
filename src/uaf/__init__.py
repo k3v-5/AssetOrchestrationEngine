@@ -1650,6 +1650,41 @@ from .universal_runtime import (
     ProductionReadyRuntime,
 )
 
+# Universal Application State, Event Bus, Command System & Replay Engine (UAF-81.65)
+from .universal_events import (
+    EventType,
+    EventPriority,
+    InputDeviceType,
+    InputEventType,
+    DispatchMode,
+    OverflowPolicy,
+    RoutingPhase,
+    ReplayMode,
+    DivergenceSeverity,
+    CommandStatus,
+    ContextPriority,
+    RateControlStrategy,
+    Event,
+    Message,
+    Command,
+    EventCommandResult,
+    InputEvent,
+    ActionMapping,
+    EventInputContext,
+    FocusTarget,
+    ReplayFrame,
+    ReplayRecording,
+    ReplayDivergence,
+    EventTelemetry,
+    DiagnosticEventBundle,
+    EventDiagnosticReport,
+    UniversalEventFabricator,
+    UniversalEventValidator,
+    UniversalEventPackager,
+    ProductionReadyEvents,
+)
+
+
 
 
 
@@ -3082,6 +3117,36 @@ __all__ = [
     "UniversalRuntimeValidator",
     "UniversalRuntimePackager",
     "ProductionReadyRuntime",
+    "EventType",
+    "EventPriority",
+    "InputDeviceType",
+    "InputEventType",
+    "DispatchMode",
+    "OverflowPolicy",
+    "RoutingPhase",
+    "ReplayMode",
+    "DivergenceSeverity",
+    "CommandStatus",
+    "ContextPriority",
+    "RateControlStrategy",
+    "Event",
+    "Message",
+    "Command",
+    "EventCommandResult",
+    "InputEvent",
+    "ActionMapping",
+    "EventInputContext",
+    "FocusTarget",
+    "ReplayFrame",
+    "ReplayRecording",
+    "ReplayDivergence",
+    "EventTelemetry",
+    "DiagnosticEventBundle",
+    "EventDiagnosticReport",
+    "UniversalEventFabricator",
+    "UniversalEventValidator",
+    "UniversalEventPackager",
+    "ProductionReadyEvents",
 ]
 
 
