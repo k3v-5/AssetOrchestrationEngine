@@ -108,7 +108,16 @@ graph TD
   - `AutoFocusDepthOfField`: Cálculo óptico de distancia focal, círculo de confusión, límites hiperfocales y aperturas de diafragma dinámicas ($f/1.4 - f/16$).
   - `UE5SequencerExporter`: Exportación estructurada de manifiestos JSON `LevelSequence` con canales de transformación, `MovieSceneCineCameraTrack`, canales flotantes de foco y scripts de importación Python para UE5.
 
-### 2.9 UAF-81.89: Efectos Visuales Avanzados, Fluidos y Acoplamiento Ambiental
+### 2.9 UAF-81.98: Grafo Narrativo Ramificado, Árboles de Diálogo y Misiones Procedurales
+- **Paquete:** `uaf.narrative`
+- **Responsabilidad:** Misiones procedurales, resolución de bifurcaciones de facción y árboles de conversación interactivos con skill checks.
+- **Salida:**
+  - `BranchingNarrativeDAG`: Grafo acíclico dirigido validado con el algoritmo de Kahn, trazado de rutas críticas y resolución de contratos de facción mutuamente excluyentes.
+  - `DialogueTreeCompiler`: Verificación de integridad referencial, evaluación de condiciones (reputación, inventario, banderas) y resolución de tiradas de habilidad (*skill checks*).
+  - `WorldStateFlagRegistry`: Registro atómico de banderas del mundo, standing de facciones y snapshots con rollback.
+  - `UE5NarrativeExporter`: Exportación de `UDataTable` (CSV/JSON) para `FQuestDefinitionRow` y `FDialogueNodeRow` con tags RichText para `CommonUI`.
+
+### 2.10 UAF-81.89: Efectos Visuales Avanzados, Fluidos y Acoplamiento Ambiental
 - **Paquete:** `uaf.vfx_advanced`
 - **Responsabilidad:** Efectos ambientales interactivos y de partículas Niagara.
 - **Salida:**

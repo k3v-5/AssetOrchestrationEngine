@@ -3168,6 +3168,30 @@ from .cinematics import (
     UE5SequencerExporter,
 )
 
+# Procedural Quest Graph, Branching Narrative & Dialogue Trees (UAF-81.98)
+from .narrative import (
+    QuestType,
+    QuestState,
+    MoralAlignment,
+    DialogueNodeType,
+    SkillCheckAttribute,
+    ConditionOperator,
+    ConsequenceType,
+    PrerequisiteCondition,
+    ConsequenceAction,
+    DialogueChoice,
+    DialogueNode,
+    DialogueTreeSpec,
+    QuestStep,
+    QuestDefinition,
+    WorldFlagSnapshot,
+    SkillCheckResult,
+    BranchingNarrativeDAG,
+    DialogueTreeCompiler,
+    WorldStateFlagRegistry,
+    UE5NarrativeExporter,
+)
+
 __all__ = [
     "ProjectContext",
     "ExecutionContext",
@@ -5793,6 +5817,26 @@ __all__ = [
     "BoundingBox3D",
     "AutoFocusDepthOfField",
     "UE5SequencerExporter",
+    "QuestType",
+    "QuestState",
+    "MoralAlignment",
+    "DialogueNodeType",
+    "SkillCheckAttribute",
+    "ConditionOperator",
+    "ConsequenceType",
+    "PrerequisiteCondition",
+    "ConsequenceAction",
+    "DialogueChoice",
+    "DialogueNode",
+    "DialogueTreeSpec",
+    "QuestStep",
+    "QuestDefinition",
+    "WorldFlagSnapshot",
+    "SkillCheckResult",
+    "BranchingNarrativeDAG",
+    "DialogueTreeCompiler",
+    "WorldStateFlagRegistry",
+    "UE5NarrativeExporter",
 ]
 
 
