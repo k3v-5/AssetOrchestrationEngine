@@ -3256,6 +3256,22 @@ from .engine_tools import (
     StudioActionDispatcher,
 )
 
+
+# Macro-Orchestrator & One-Click Full Vertical Slice Builder (UAF-81.102)
+from .macro_orchestrator import (
+    SliceSize,
+    OrchestrationStage,
+    SpatialFootprint,
+    StageExecutionMetric,
+    VerticalSliceConfig,
+    IntegratedSliceManifest,
+    SpatialConstraintSolver,
+    VerticalSliceMasterOrchestrator,
+    MasterPackageIntegrator,
+    PackageResult,
+    build_vertical_slice,
+)
+
 __all__ = [
     "ProjectContext",
     "ExecutionContext",
@@ -5951,6 +5967,17 @@ __all__ = [
     "UE5StudioPaletteGenerator",
     "BlenderStudioPanelGenerator",
     "StudioActionDispatcher",
+    "SliceSize",
+    "OrchestrationStage",
+    "SpatialFootprint",
+    "StageExecutionMetric",
+    "VerticalSliceConfig",
+    "IntegratedSliceManifest",
+    "SpatialConstraintSolver",
+    "VerticalSliceMasterOrchestrator",
+    "MasterPackageIntegrator",
+    "PackageResult",
+    "build_vertical_slice",
 ]
 
 

@@ -216,3 +216,78 @@ ai_exp.export_to_json(ai_manifest, "./export/L_SectorAlpha/AI_manifest.json")
 1. **Cero Dependencia de Entorno Gráfico**: El motor genera, simula y verifica geometría, físicas de partículas, lógicas GOAP y formatos binarios sin requerir la presencia local del binario `UnrealEditor.exe`.
 2. **Determinismo por Semilla**: Toda llamada utiliza generadores de números pseudoaleatorios aislados (`random.Random(seed)`), garantizando resultados reproducibles bit a bit.
 3. **Compatibilidad Nativa**: Todos los archivos producidos (`.r16`, `.r8`, `.json`, scripts Python de `unreal`) son estándares oficiales de Unreal Engine 5.
+
+---
+
+## 5. Macro-Orquestación y Generación de Rebanadas Verticales en Un Clic (UAF-81.102)
+
+Para culminar la suite procedimental universal de AOE, el paquete `uaf.macro_orchestrator` unifica los motores independientes bajo un flujo sinérgico continuo de 8 etapas:
+
+```
+[Configuración de Rebanada (VerticalSliceConfig)]
+                       │
+       ┌───────────────┴───────────────┐
+       ▼                               ▼
+[1. Macro-Landscape]          [2. Spatial Constraint Solver]
+(Erosión fluvial/térmica)      (Búsqueda de meseta y aplanamiento de pad)
+       │                               │
+       └───────────────┬───────────────┘
+                       ▼
+            [3. Interior WFC 2D/3D]
+            (Búnker modular con puertas y llaves)
+                       │
+                       ▼
+            [4. Escuadrones IA Tácticos]
+            (Líder, puntos de avance, StateTrees)
+                       │
+                       ▼
+       [5. Clima Volumétrico & Iluminación]
+       (Kasten-Young, Kelvin Planck, niebla)
+                       │
+                       ▼
+         [6. Destrucción Chaos Voronoi]
+         (Partición de mallas y anclajes)
+                       │
+                       ▼
+          [7. MetaSounds & Acústica RT60]
+          (Reverberación Sabine-Eyring y Stems)
+                       │
+                       ▼
+          [8. Auditoría Playtest Headless]
+          (Navegación A*, objetivos y softlocks)
+                       │
+                       ▼
+          [Empaquetador Maestro de Entrega]
+          (Manifiesto, .r16, weightmaps y script UE5)
+```
+
+### Ejemplo de Uso del Orquestador Maestro
+
+```python
+from uaf.macro_orchestrator import (
+    VerticalSliceConfig,
+    SliceSize,
+    VerticalSliceMasterOrchestrator,
+    MasterPackageIntegrator,
+    build_vertical_slice,
+)
+from uaf.weather_atmosphere import WeatherBiomeType
+
+# 1. Generación programática directa
+cfg = VerticalSliceConfig(
+    slice_name="Outpost_Epsilon",
+    size=SliceSize.MEDIUM,
+    biome=WeatherBiomeType.VOLCANIC,
+    seed=999,
+)
+pkg_result = build_vertical_slice(config=cfg, output_dir="output/outpost_epsilon", as_zip=True)
+
+print(f"Paquete generado en: {pkg_result.bundle_directory}")
+print(f"Script de importación UE5: {pkg_result.ue5_script_path}")
+```
+
+### Invocación desde CLI
+
+```bash
+aoe build-slice --name Outpost_Epsilon --size MEDIUM --biome VOLCANIC --seed 999 --zip
+```
