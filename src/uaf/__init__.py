@@ -3240,6 +3240,22 @@ from .weather_atmosphere import (
     UE5WeatherExporter,
 )
 
+
+# Universal DCC & Engine Bridge Tools (UAF-81.101)
+from .engine_tools import (
+    TargetEnvironment,
+    ParameterType,
+    ToolCategory,
+    ToolParameterSpec,
+    StudioActionSpec,
+    ActionResult,
+    EnginePaletteManifest,
+    create_default_studio_actions,
+    UE5StudioPaletteGenerator,
+    BlenderStudioPanelGenerator,
+    StudioActionDispatcher,
+)
+
 __all__ = [
     "ProjectContext",
     "ExecutionContext",
@@ -5924,6 +5940,17 @@ __all__ = [
     "DayNightCycleController",
     "EnvironmentalShaderBlender",
     "UE5WeatherExporter",
+    "TargetEnvironment",
+    "ParameterType",
+    "ToolCategory",
+    "ToolParameterSpec",
+    "StudioActionSpec",
+    "ActionResult",
+    "EnginePaletteManifest",
+    "create_default_studio_actions",
+    "UE5StudioPaletteGenerator",
+    "BlenderStudioPanelGenerator",
+    "StudioActionDispatcher",
 ]
 
 

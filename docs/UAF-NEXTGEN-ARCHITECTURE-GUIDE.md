@@ -149,6 +149,15 @@ graph TD
   - `EnvironmentalShaderBlender`: Capas procedurales de material para lluvia/secado termodinámico, charcos reflectantes con aplanamiento de normales, acumulación de nieve cenital con corte en acantilados ($>50^\circ$), y parámetros de animación de follaje por viento.
   - `UE5WeatherExporter`: Exportación de manifiestos JSON, canales de curvas continuas de 24 horas para Sequencer y scripts Python de automatización para UE5 Editor.
 
+
+### 2.12 UAF-81.101: Herramientas Nativas de Enlace DCC & Motores (UE5 y Blender)
+- **Paquete:** `uaf.engine_tools`
+- **Responsabilidad:** Generación de herramientas in-engine portables y desacopladas para invocar y controlar toda la generación procedimental directamente dentro de Unreal Engine 5 y Blender.
+- **Salida:**
+  - `UE5StudioPaletteGenerator`: Script Python dockable para el editor de UE5 (`aoe_ue5_palette.py`) con controles por pestañas para terreno, interiores WFC, clima Lumen, Chaos y MetaSounds.
+  - `BlenderStudioPanelGenerator`: Addon ligero para Blender (`aoe_blender_addon.py`) con panel lateral N en el 3D Viewport para verificar mallas manifold y exportar FBX listo para Unreal.
+  - `StudioActionDispatcher`: Enrutador centralizado con catálogo estándar de 8 acciones procedimentales y validación estricta de límites paramétricos.
+
 ### 2.8 UAF-81.88 y Pipeline Portátil de Entrega UE5
 - **Paquetes:** `uaf.golden_slice`, `uaf.export`, plugin `UAFBridge`
 - **Responsabilidad:** Empaquetado, certificación automática contra 7 compuertas y exportación lista para Unreal.

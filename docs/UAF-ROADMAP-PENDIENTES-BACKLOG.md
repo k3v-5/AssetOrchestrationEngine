@@ -20,8 +20,8 @@ Este documento registra formalmente las fases estratégicas identificadas y pend
 | **UAF-81.98** | Procedural Quest Graph, Branching Narrative & Dialogue Trees | Diálogos ramificados, skill checks, reputación y CommonUI | ✅ **COMPLETADO & CERTIFICADO** |
 | **UAF-81.99** | Physics, Voronoi Fracturing & Chaos Destruction System | Fracturación Voronoi, UE5 Chaos GeometryCollection, escombros | ✅ **COMPLETADO & CERTIFICADO** |
 | **UAF-81.100** | Volumetric Weather Cycles, Dynamic Day/Night & Atmosphere | Ciclos día/noche, SkyAtmosphere, niebla volumétrica y shaders | ✅ **COMPLETADO & CERTIFICADO** |
-| **UAF-81.101** | Studio Web UI & Local Interactive Visual Dashboard | Interfaz local FastAPI + WebGL/Three.js, visor 3D y 1-click | Alta (Siguiente Objetivo) |
-| **UAF-81.102** | One-Click Full Vertical Slice Builder (Macro-Orchestrator) | Pipeline unificado de nivel completo listo para jugar en UE5 | Alta |
+| **UAF-81.101** | Universal DCC & Engine Bridge Tools (UE5 & Blender) | Paleta Slate en UE5, Addon N-Panel Blender y Dispatcher | ✅ **COMPLETADO & CERTIFICADO** |
+| **UAF-81.102** | One-Click Full Vertical Slice Builder (Macro-Orchestrator) | Pipeline unificado de nivel completo listo para jugar en UE5 | Alta (Siguiente y Último Objetivo) |
 
 ---
 
@@ -166,20 +166,25 @@ Integrar los biomas ecológicos de Whittaker (UAF-81.91) con la iluminación din
 
 ---
 
-## 9. UAF-81.101: STUDIO WEB UI & LOCAL INTERACTIVE VISUAL DASHBOARD
+## 9. UAF-81.101: UNIVERSAL DCC & ENGINE BRIDGE TOOLS (UE5 & BLENDER)
 
 ### 9.1 Misión y Objetivos
-Proporcionar una estación de trabajo visual interactiva en navegador local (FastAPI + WebGL / Three.js) para inspeccionar mapas 3D, salas WFC, escuadras de IA y ajustar parámetros sin requerir software externo.
+Proporcionar herramientas de control procedimental nativas, desacopladas y portables para Unreal Engine 5 y Blender, permitiendo a los diseñadores disparar e inspeccionar cualquier pipeline de generación de AOE directamente desde el viewport sin salir del motor.
 
 ### 9.2 Componentes Arquitectónicos
-1. **Servidor Local de Telemetría y Control (`LocalDashboardServer`)**:
-   - Servicio ligero FastAPI con comunicación WebSocket para sincronización en tiempo real.
-2. **Visor de Terrenos 3D WebGL (`WebGLTerrainViewer`)**:
-   - Renderizado en GPU de los mapas de altura `.r16` y weightmaps con paletas de bioma y curvas de nivel en tiempo real.
-3. **Inspección de Niveles WFC (`InteractiveWFCInspector`)**:
-   - Explorador ortogonal e isométrico de habitaciones, puertas llave-cerradura, volúmenes de cobertura y patrullas de escuadrones GOAP.
-4. **Panel de Ajustes Paramétricos & Exportación 1-Click**:
-   - Controles interactivos para semillas de ruido, escalas de erosión y balance de dificultad, con botón de exportación directa a bundle UE5.
+1. **Generador de Paleta para Unreal Engine 5 (`UE5StudioPaletteGenerator`)**:
+   - Generación de scripts autónomos de Editor Utility / Slate (`aoe_ue5_palette.py`) integrables en el menú de ventana de cualquier proyecto de UE5.
+   - Controles para Macro-Paisaje, WFC, Clima Lumen, Chaos Destruction y Audio MetaSounds con ejecución en-proceso o vía LiveLink.
+2. **Generador de Panel N para Blender (`BlenderStudioPanelGenerator`)**:
+   - Addon ligero (`aoe_blender_addon.py`) que añade la pestaña 'AOE Studio' al panel lateral 3D.
+   - Operadores nativos para verificación de geometría manifold, alineación de pivote en origen y exportación FBX con convenciones de Unreal (Z-up, escala métrica).
+3. **Despachador Central de Acciones (`StudioActionDispatcher`)**:
+   - Enrutador desacoplado con validación estricta de rangos paramétricos y soporte para handlers procedimentales personalizados.
+
+### 9.3 Estado de Certificación y Verificación
+- **Paquete:** `src/uaf/engine_tools/`
+- **Suite de Pruebas:** `tests/uaf/test_acceptance_uaf81_101.py` (16/16 tests PASS - 100%).
+- **Certificación:** ✅ **COMPLETADO & CERTIFICADO** sin regresiones en el framework global.
 
 ---
 
