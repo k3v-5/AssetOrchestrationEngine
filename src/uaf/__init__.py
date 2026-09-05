@@ -3149,6 +3149,25 @@ from .playtesting import (
     QAReportExporter,
 )
 
+# Procedural Cinematics, CineCamera Director & UE5 Sequencer (UAF-81.97)
+from .cinematics import (
+    CinematicShotType,
+    FramingRule,
+    CameraDampingMode,
+    CinematicSubject,
+    LensSettings,
+    FocusSettings,
+    CameraKeyframe,
+    CinematicShot,
+    CinematicSequenceSpec,
+    UE5LevelSequenceManifest,
+    CinematicFramingEngine,
+    CameraTrajectorySolver,
+    BoundingBox3D,
+    AutoFocusDepthOfField,
+    UE5SequencerExporter,
+)
+
 __all__ = [
     "ProjectContext",
     "ExecutionContext",
@@ -5759,6 +5778,21 @@ __all__ = [
     "SoftlockAndDifficultyAnalyzer",
     "ClosedLoopPacingCalibrator",
     "QAReportExporter",
+    "CinematicShotType",
+    "FramingRule",
+    "CameraDampingMode",
+    "CinematicSubject",
+    "LensSettings",
+    "FocusSettings",
+    "CameraKeyframe",
+    "CinematicShot",
+    "CinematicSequenceSpec",
+    "UE5LevelSequenceManifest",
+    "CinematicFramingEngine",
+    "CameraTrajectorySolver",
+    "BoundingBox3D",
+    "AutoFocusDepthOfField",
+    "UE5SequencerExporter",
 ]
 
 

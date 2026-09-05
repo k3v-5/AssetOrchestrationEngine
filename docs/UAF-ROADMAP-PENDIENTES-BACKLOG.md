@@ -16,8 +16,8 @@ Este documento registra formalmente las fases estratégicas identificadas y pend
 | **UAF-81.94** | Procedural Interactive Audio, Spatial Acoustics & MetaSounds | Síntesis interactiva, Acústica $RT_{60}$, MetaSounds & Quartz | ✅ **COMPLETADO & CERTIFICADO** |
 | **UAF-81.95** | Real-Time In-Engine Co-Piloting & Live Synchronization | WebSocket / gRPC LiveLink bidireccional AOE $\leftrightarrow$ UE5 | ✅ **COMPLETADO & CERTIFICADO** |
 | **UAF-81.96** | Autonomous Gameplay Playtesting & AI QA Simulation | Agentes headless de QA, detección de softlocks y telemetría | ✅ **COMPLETADO & CERTIFICADO** |
-| **UAF-81.97** | Procedural Cinematics, CineCamera Director & UE5 Sequencer | Encuadres dinámicos, Rule of Thirds, auto-DOF, LevelSequence | Alta (Siguiente Objetivo) |
-| **UAF-81.98** | Procedural Quest Graph, Branching Narrative & Dialogue Trees | Diálogos ramificados, skill checks, reputación y CommonUI | Media |
+| **UAF-81.97** | Procedural Cinematics, CineCamera Director & UE5 Sequencer | Encuadres dinámicos, Rule of Thirds, auto-DOF, LevelSequence | ✅ **COMPLETADO & CERTIFICADO** |
+| **UAF-81.98** | Procedural Quest Graph, Branching Narrative & Dialogue Trees | Diálogos ramificados, skill checks, reputación y CommonUI | Alta (Siguiente Objetivo) |
 | **UAF-81.99** | Physics, Voronoi Fracturing & Chaos Destruction System | Fracturación Voronoi, UE5 Chaos GeometryCollection, escombros | Media |
 | **UAF-81.100** | Volumetric Weather Cycles, Dynamic Day/Night & Atmosphere | Ciclos día/noche, SkyAtmosphere, niebla volumétrica y shaders | Media |
 | **UAF-81.101** | Studio Web UI & Local Interactive Visual Dashboard | Interfaz local FastAPI + WebGL/Three.js, visor 3D y 1-click | Alta |

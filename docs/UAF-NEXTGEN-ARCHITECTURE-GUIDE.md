@@ -99,7 +99,16 @@ graph TD
   - `ClosedLoopPacingCalibrator`: Calibración en bucle cerrado que genera parches correctivos directos para reequilibrar enemigos, reubicar llaves y abastecer suministros.
   - `QAReportExporter`: Generador de reportes de auditoría en JSON, Markdown y matrices tabulares CSV.
 
-### 2.8 UAF-81.89: Efectos Visuales Avanzados, Fluidos y Acoplamiento Ambiental
+### 2.8 UAF-81.97: Cinemáticas Procedurales, Director CineCamera y UE5 Sequencer
+- **Paquete:** `uaf.cinematics`
+- **Responsabilidad:** Dirección de cámara automatizada, encuadres cinemáticos y exportación a LevelSequence para Unreal Engine 5.
+- **Salida:**
+  - `CinematicFramingEngine`: Composición basada en regla de tercios ($1/3, 2/3$), proporción áurea ($\phi = 0.618$), tomas Over-The-Shoulder y respeto estricto de la regla de 180° en planos y contraplanos.
+  - `CameraTrajectorySolver`: Generación de splines Catmull-Rom continuos de clase $C^1$ con evitación de colisiones contra bounding boxes y orografía.
+  - `AutoFocusDepthOfField`: Cálculo óptico de distancia focal, círculo de confusión, límites hiperfocales y aperturas de diafragma dinámicas ($f/1.4 - f/16$).
+  - `UE5SequencerExporter`: Exportación estructurada de manifiestos JSON `LevelSequence` con canales de transformación, `MovieSceneCineCameraTrack`, canales flotantes de foco y scripts de importación Python para UE5.
+
+### 2.9 UAF-81.89: Efectos Visuales Avanzados, Fluidos y Acoplamiento Ambiental
 - **Paquete:** `uaf.vfx_advanced`
 - **Responsabilidad:** Efectos ambientales interactivos y de partículas Niagara.
 - **Salida:**
