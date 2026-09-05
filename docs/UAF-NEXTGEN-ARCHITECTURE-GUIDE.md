@@ -1,7 +1,7 @@
-# Guía Maestra de Arquitectura Next-Gen — AOE / UAF (Fases 81.88 a 81.93)
+# Guía Maestra de Arquitectura Next-Gen — AOE / UAF (Fases 81.88 a 81.94)
 
 **Documento:** Manual Técnico y Arquitectura de Integración  
-**Alcance:** Fases UAF-81.88 a UAF-81.93 + Pipeline Portátil de Entrega UE5  
+**Alcance:** Fases UAF-81.88 a UAF-81.94 + Pipeline Portátil de Entrega UE5  
 **Plataforma de Ejecución:** Headless Python 3.13 + Unreal Engine 5 (Windows)  
 
 ---
@@ -16,10 +16,11 @@ graph TD
     B --> C["UAF-81.90: Ensamblaje Interior WFC & Misiones"]
     C --> D["UAF-81.92: IA Cognitiva GOAP & Escuadrones"]
     D --> E["UAF-81.93: Economía, Afijos & Loot GAS"]
-    E --> F["UAF-81.89: VFX Avanzados & Acoplamiento Fluido"]
-    F --> G["UAF-81.88: Certificación Autónoma Golden Slice"]
-    G --> H["UE5 Portable Delivery Pipeline (aoe export-bundle)"]
-    H --> I["Ingesta Desatendida en Unreal Engine 5 Editor"]
+    E --> F["UAF-81.94: Audio Interactivo & MetaSounds"]
+    F --> G["UAF-81.89: VFX Avanzados & Acoplamiento Fluido"]
+    G --> H["UAF-81.88: Certificación Autónoma Golden Slice"]
+    H --> I["UE5 Portable Delivery Pipeline (aoe export-bundle)"]
+    I --> J["Ingesta Desatendida en Unreal Engine 5 Editor"]
 ```
 
 ---
@@ -68,7 +69,17 @@ graph TD
   - `DynamicMarketManager` & `SalvageWorkshop`: Precios acoplados a las 5 fases de tensión del Director de Ritmo y taller de reciclaje/reforja.
   - `UE5GASExporter`: Exportación directa a `UDataTable` (CSV/JSON) para `FWeaponItemDefinition` y `UGameplayEffect`.
 
-### 2.5 UAF-81.89: Efectos Visuales Avanzados, Fluidos y Acoplamiento Ambiental
+### 2.5 UAF-81.94: Audio Interactivo, Acústica Espacial y MetaSounds
+- **Paquete:** `uaf.interactive_audio`
+- **Responsabilidad:** Orquestación musical adaptativa por stems, reverberación física y espacialización 3D conforme a la Regla 10.
+- **Salida:**
+  - `AdaptiveMusicOrchestrator` & `QuartzQuantizationClock`: Fundidos cruzados de potencia constante ($g_{\text{in}}^2 + g_{\text{out}}^2 = 1.0$) sincronizados a compases musicales y acoplados al `DynamicPacingDirector`.
+  - `SabineEyringAcousticCalculator`: Cálculo analítico de tiempos de reverberación $RT_{60}$ por Sabine y Eyring, y modos axiales de resonancia sobre salas WFC.
+  - `TopologicalAcousticDiffraction`: Pérdida de transmisión (+24 dB por puertas cerradas) y filtrado paso-bajo a través del grafo topológico.
+  - `SpatialAttenuationCalculator`: Enforzamiento estricto de la Regla 10 ($\le 20\text{ m}$ para bucles de enemigos con volumen $0\text{ dB}$ en el exterior) y paneo estéreo binaural.
+  - `UE5MetaSoundsExporter`: Exportación de grafos `.json` para MetaSounds Source Assets y presets de `USoundAttenuation`.
+
+### 2.6 UAF-81.89: Efectos Visuales Avanzados, Fluidos y Acoplamiento Ambiental
 - **Paquete:** `uaf.vfx_advanced`
 - **Responsabilidad:** Efectos ambientales interactivos y de partículas Niagara.
 - **Salida:**
@@ -81,7 +92,7 @@ graph TD
   - Acoplador espectral de audio a partículas (ADSR + filtros de frecuencia).
   - Compilador JIT de scripts VFX a HLSL/C++ para Niagara.
 
-### 2.6 UAF-81.88 y Pipeline Portátil de Entrega UE5
+### 2.7 UAF-81.88 y Pipeline Portátil de Entrega UE5
 - **Paquetes:** `uaf.golden_slice`, `uaf.export`, plugin `UAFBridge`
 - **Responsabilidad:** Empaquetado, certificación automática contra 7 compuertas y exportación lista para Unreal.
 - **Salida:**

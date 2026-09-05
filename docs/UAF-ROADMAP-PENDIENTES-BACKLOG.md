@@ -2,7 +2,7 @@
 
 **Estado:** Documento de Planificación y Registro de Pendientes  
 **Programa:** Universal Asset Factory (AOE / UAF)  
-**Dependencias Previas Completadas:** UAF-81.0 → UAF-81.93 (100% verificado y certificado)  
+**Dependencias Previas Completadas:** UAF-81.0 → UAF-81.94 (100% verificado y certificado)  
 
 Este documento registra formalmente las fases estratégicas identificadas y pendientes de ejecución para expandir la autonomía y profundidad del Universal Asset Framework en conjunción con Unreal Engine 5.
 
@@ -13,8 +13,8 @@ Este documento registra formalmente las fases estratégicas identificadas y pend
 | Fase | Título | Dominio Técnico | Prioridad / Estado |
 | :--- | :--- | :--- | :--- |
 | **UAF-81.93** | Dynamic Economy, Weapon Affixes & Procedural Loot Fabric | Progresión RPG, Loot Tables, Affixes, GAS & UE5 DataTables | ✅ **COMPLETADO & CERTIFICADO** |
-| **UAF-81.94** | Procedural Interactive Audio, Spatial Acoustics & MetaSounds | Síntesis interactiva, Acústica $RT_{60}$, MetaSounds & Quartz | Alta (Siguiente Objetivo) |
-| **UAF-81.95** | Real-Time In-Engine Co-Piloting & Live Synchronization | WebSocket / gRPC LiveLink bidireccional AOE $\leftrightarrow$ UE5 | Media |
+| **UAF-81.94** | Procedural Interactive Audio, Spatial Acoustics & MetaSounds | Síntesis interactiva, Acústica $RT_{60}$, MetaSounds & Quartz | ✅ **COMPLETADO & CERTIFICADO** |
+| **UAF-81.95** | Real-Time In-Engine Co-Piloting & Live Synchronization | WebSocket / gRPC LiveLink bidireccional AOE $\leftrightarrow$ UE5 | Alta (Siguiente Objetivo) |
 | **UAF-81.96** | Autonomous Gameplay Playtesting & AI QA Simulation | Agentes headless de QA, detección de softlocks y telemetría | Media |
 | **UAF-81.97** | Procedural Cinematics, CineCamera Director & UE5 Sequencer | Encuadres dinámicos, Rule of Thirds, auto-DOF, LevelSequence | Media |
 | **UAF-81.98** | Procedural Quest Graph, Branching Narrative & Dialogue Trees | Diálogos ramificados, skill checks, reputación y CommonUI | Media |

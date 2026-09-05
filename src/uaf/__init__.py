@@ -3078,6 +3078,29 @@ from .economy import (
     UE5GASExporter,
 )
 
+# Procedural Interactive Audio, Spatial Acoustics & MetaSounds (UAF-81.94)
+from .interactive_audio import (
+    AcousticMaterial,
+    StemRole,
+    QuantizationSubdivision,
+    OcclusionState,
+    AttenuationCurveType,
+    MATERIAL_ABSORPTION_TABLE,
+    MaterialAbsorption,
+    RoomAcousticProfile,
+    AudioStem,
+    SpatialAttenuationProfile,
+    AcousticRaycastResult,
+    QuartzQuantizationClock,
+    AdaptiveMusicOrchestrator,
+    SabineEyringAcousticCalculator,
+    TopologicalAcousticDiffraction,
+    SpatialAttenuationCalculator,
+    MetaSoundNodeSchema,
+    UE5MetaSoundsGraphManifest,
+    UE5MetaSoundsExporter,
+)
+
 __all__ = [
     "ProjectContext",
     "ExecutionContext",
@@ -5629,6 +5652,25 @@ __all__ = [
     "SalvageWorkshop",
     "UE5GASDataTableManifest",
     "UE5GASExporter",
+    "AcousticMaterial",
+    "StemRole",
+    "QuantizationSubdivision",
+    "OcclusionState",
+    "AttenuationCurveType",
+    "MATERIAL_ABSORPTION_TABLE",
+    "MaterialAbsorption",
+    "RoomAcousticProfile",
+    "AudioStem",
+    "SpatialAttenuationProfile",
+    "AcousticRaycastResult",
+    "QuartzQuantizationClock",
+    "AdaptiveMusicOrchestrator",
+    "SabineEyringAcousticCalculator",
+    "TopologicalAcousticDiffraction",
+    "SpatialAttenuationCalculator",
+    "MetaSoundNodeSchema",
+    "UE5MetaSoundsGraphManifest",
+    "UE5MetaSoundsExporter",
 ]
 
 
