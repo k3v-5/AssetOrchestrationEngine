@@ -3122,6 +3122,33 @@ from .copilot import (
     UE5CoPilotListener,
 )
 
+# Autonomous Gameplay Playtesting & AI QA Simulation (UAF-81.96)
+from .playtesting import (
+    PlaytestArchetype,
+    SimulationOutcome,
+    SoftlockType,
+    SoftlockSeverity,
+    TelemetryEventType,
+    HeatmapMetric,
+    AgentStats,
+    ArchetypeProfile,
+    TelemetryEvent,
+    EnemySpawn,
+    DoorConnection,
+    RoomSpec,
+    PlaytestLevelSpec,
+    SoftlockIncident,
+    DifficultySpikeIncident,
+    HeatmapGrid2D,
+    PlaytestRunResult,
+    QASimulationSuiteSummary,
+    HeadlessPlaytestAgent,
+    SpatialHeatmapGenerator,
+    SoftlockAndDifficultyAnalyzer,
+    ClosedLoopPacingCalibrator,
+    QAReportExporter,
+)
+
 __all__ = [
     "ProjectContext",
     "ExecutionContext",
@@ -5709,6 +5736,29 @@ __all__ = [
     "CoPilotReconciler",
     "CoPilotDaemonServer",
     "UE5CoPilotListener",
+    "PlaytestArchetype",
+    "SimulationOutcome",
+    "SoftlockType",
+    "SoftlockSeverity",
+    "TelemetryEventType",
+    "HeatmapMetric",
+    "AgentStats",
+    "ArchetypeProfile",
+    "TelemetryEvent",
+    "EnemySpawn",
+    "DoorConnection",
+    "RoomSpec",
+    "PlaytestLevelSpec",
+    "SoftlockIncident",
+    "DifficultySpikeIncident",
+    "HeatmapGrid2D",
+    "PlaytestRunResult",
+    "QASimulationSuiteSummary",
+    "HeadlessPlaytestAgent",
+    "SpatialHeatmapGenerator",
+    "SoftlockAndDifficultyAnalyzer",
+    "ClosedLoopPacingCalibrator",
+    "QAReportExporter",
 ]
 
 

@@ -89,7 +89,17 @@ graph TD
   - `CoPilotReconciler`: Modelo de concurrencia determinista con `DESIGNER_LOCK_WINS` para proteger ajustes manuales de nivel frente a regeneraciones procedurales.
   - `UE5CoPilotListener`: Hook de integración para el hilo principal de Unreal Editor vía Slate timers.
 
-### 2.7 UAF-81.89: Efectos Visuales Avanzados, Fluidos y Acoplamiento Ambiental
+### 2.7 UAF-81.96: Playtesting Autónomo de Gameplay y Simulación AI QA
+- **Paquete:** `uaf.playtesting`
+- **Responsabilidad:** Validación masiva y headless de diseño de nivel, balance de dificultad y detección de bloqueos mediante bots autónomos multí-arquetipo.
+- **Salida:**
+  - `HeadlessPlaytestAgent`: Simulación discreta por ticks de jugadores (`EXPLORER`, `SPEEDRUNNER`, `COMBATANT`, `NOVICE`, `COMPLETIONIST`) con gestión de combate, munición, salud y puzzles Lock-and-Key.
+  - `SpatialHeatmapGenerator`: Grillas 2D/3D con convolución gaussiana y normalización de densidades (`DEATH_DENSITY`, `AMMO_EXPENDITURE`, `DWELL_TIME`, `DAMAGE_TAKEN`, `PATH_TRAVERSAL`).
+  - `SoftlockAndDifficultyAnalyzer`: Detección topológica estática de ciclos llave-puerta y callejones sin retorno, y análisis empírico de picos injustos de dificultad ($TTK < 1.5\text{ s}$, supervivencia $< 20\%$).
+  - `ClosedLoopPacingCalibrator`: Calibración en bucle cerrado que genera parches correctivos directos para reequilibrar enemigos, reubicar llaves y abastecer suministros.
+  - `QAReportExporter`: Generador de reportes de auditoría en JSON, Markdown y matrices tabulares CSV.
+
+### 2.8 UAF-81.89: Efectos Visuales Avanzados, Fluidos y Acoplamiento Ambiental
 - **Paquete:** `uaf.vfx_advanced`
 - **Responsabilidad:** Efectos ambientales interactivos y de partículas Niagara.
 - **Salida:**
