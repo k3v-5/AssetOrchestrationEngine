@@ -3192,6 +3192,24 @@ from .narrative import (
     UE5NarrativeExporter,
 )
 
+# Physics, Voronoi Fracturing & Chaos Destruction System (UAF-81.99)
+from .chaos_destruction import (
+    DestructionMaterialType,
+    FracturePatternType,
+    ClusterHierarchyLevel,
+    AnchorMode,
+    VoronoiSite,
+    FracturedPiece,
+    AnchorFieldSpec,
+    DebrisParticlePreset,
+    GeometryCollectionSpec,
+    ChaosDestructionBundle,
+    VoronoiFractureEngine,
+    ChaosGeometryCollectionCompiler,
+    DebrisFieldEmitter,
+    UE5ChaosExporter,
+)
+
 __all__ = [
     "ProjectContext",
     "ExecutionContext",
@@ -5837,6 +5855,20 @@ __all__ = [
     "DialogueTreeCompiler",
     "WorldStateFlagRegistry",
     "UE5NarrativeExporter",
+    "DestructionMaterialType",
+    "FracturePatternType",
+    "ClusterHierarchyLevel",
+    "AnchorMode",
+    "VoronoiSite",
+    "FracturedPiece",
+    "AnchorFieldSpec",
+    "DebrisParticlePreset",
+    "GeometryCollectionSpec",
+    "ChaosDestructionBundle",
+    "VoronoiFractureEngine",
+    "ChaosGeometryCollectionCompiler",
+    "DebrisFieldEmitter",
+    "UE5ChaosExporter",
 ]
 
 

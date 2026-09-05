@@ -117,7 +117,16 @@ graph TD
   - `WorldStateFlagRegistry`: Registro atómico de banderas del mundo, standing de facciones y snapshots con rollback.
   - `UE5NarrativeExporter`: Exportación de `UDataTable` (CSV/JSON) para `FQuestDefinitionRow` y `FDialogueNodeRow` con tags RichText para `CommonUI`.
 
-### 2.10 UAF-81.89: Efectos Visuales Avanzados, Fluidos y Acoplamiento Ambiental
+### 2.10 UAF-81.99: Fracturación Voronoi y Destrucción Física Chaos
+- **Paquete:** `uaf.chaos_destruction`
+- **Responsabilidad:** Fracturación procedural volumétrica de piezas modulares WFC y generación de colecciones físicas GeometryCollection para Unreal Engine 5 Chaos Physics.
+- **Salida:**
+  - `VoronoiFractureEngine`: Distribuciones Voronoi uniformes y radiales concentradas en epicentros de impacto, organizadas en racimos jerárquicos (Macro Chunks y Micro Debris).
+  - `ChaosGeometryCollectionCompiler`: Cálculo determinista de masa según densidad de material ($\text{kg/m}^3$), umbrales de rotura por nivel y campos de anclaje (`AnchorFieldSpec`) para estabilidad estructural.
+  - `DebrisFieldEmitter`: Simulación de impulsos cinéticos de dispersión de escombros y presets Niagara de polvo, astillas y chispas.
+  - `UE5ChaosExporter`: Exportación estructurada a formato `GeometryCollection` JSON y script de generación Python para Unreal Editor.
+
+### 2.11 UAF-81.89: Efectos Visuales Avanzados, Fluidos y Acoplamiento Ambiental
 - **Paquete:** `uaf.vfx_advanced`
 - **Responsabilidad:** Efectos ambientales interactivos y de partículas Niagara.
 - **Salida:**
