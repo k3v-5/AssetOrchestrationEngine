@@ -1,7 +1,7 @@
-# Guía Maestra de Arquitectura Next-Gen — AOE / UAF (Fases 81.88 a 81.92)
+# Guía Maestra de Arquitectura Next-Gen — AOE / UAF (Fases 81.88 a 81.93)
 
 **Documento:** Manual Técnico y Arquitectura de Integración  
-**Alcance:** Fases UAF-81.88 a UAF-81.92 + Pipeline Portátil de Entrega UE5  
+**Alcance:** Fases UAF-81.88 a UAF-81.93 + Pipeline Portátil de Entrega UE5  
 **Plataforma de Ejecución:** Headless Python 3.13 + Unreal Engine 5 (Windows)  
 
 ---
@@ -15,10 +15,11 @@ graph TD
     A["Especificación de Producción (JSON / Intent)"] --> B["UAF-81.91: Macro-Paisaje & Carreteras"]
     B --> C["UAF-81.90: Ensamblaje Interior WFC & Misiones"]
     C --> D["UAF-81.92: IA Cognitiva GOAP & Escuadrones"]
-    D --> E["UAF-81.89: VFX Avanzados & Acoplamiento Fluido"]
-    E --> F["UAF-81.88: Certificación Autónoma Golden Slice"]
-    F --> G["UE5 Portable Delivery Pipeline (aoe export-bundle)"]
-    G --> H["Ingesta Desatendida en Unreal Engine 5 Editor"]
+    D --> E["UAF-81.93: Economía, Afijos & Loot GAS"]
+    E --> F["UAF-81.89: VFX Avanzados & Acoplamiento Fluido"]
+    F --> G["UAF-81.88: Certificación Autónoma Golden Slice"]
+    G --> H["UE5 Portable Delivery Pipeline (aoe export-bundle)"]
+    H --> I["Ingesta Desatendida en Unreal Engine 5 Editor"]
 ```
 
 ---
@@ -56,7 +57,18 @@ graph TD
   - `FactionReputationMatrix`: Matriz diplomática con efecto cascada por alianzas.
   - Exportador para **UE5 StateTree** (estados, tareas, transiciones y variables de Blackboard).
 
-### 2.4 UAF-81.89: Efectos Visuales Avanzados, Fluidos y Acoplamiento Ambiental
+### 2.4 UAF-81.93: Economía Dinámica, Afijos de Armas y Loot Procedural (GAS)
+- **Paquete:** `uaf.economy`
+- **Responsabilidad:** Provee el sistema de combate, presupuesto de daño e itemización RPG desacoplado.
+- **Salida:**
+  - `PowerBudgetCalculator`: Presupuesto matemático determinista $\text{Budget} = \text{BasePower} \cdot (1 + 0.12 \cdot L) \cdot R_{\text{mult}}$ con conservación de DPS para 8 arquetipos.
+  - Matriz de sinergia y mitigación elemental (Kinetic, Incendiary, Cryo, Shock, Corrosive, Void) contra 4 clases de blindaje.
+  - `ProceduralAffixGenerator`: Generación determinista de prefijos, sufijos y perks legendarios con nombres sintéticos y tags GAS.
+  - `LootDropGenerator`: Tablas de drop ponderadas con escalado de Suerte y protección de mala racha (PRD).
+  - `DynamicMarketManager` & `SalvageWorkshop`: Precios acoplados a las 5 fases de tensión del Director de Ritmo y taller de reciclaje/reforja.
+  - `UE5GASExporter`: Exportación directa a `UDataTable` (CSV/JSON) para `FWeaponItemDefinition` y `UGameplayEffect`.
+
+### 2.5 UAF-81.89: Efectos Visuales Avanzados, Fluidos y Acoplamiento Ambiental
 - **Paquete:** `uaf.vfx_advanced`
 - **Responsabilidad:** Efectos ambientales interactivos y de partículas Niagara.
 - **Salida:**
@@ -69,7 +81,7 @@ graph TD
   - Acoplador espectral de audio a partículas (ADSR + filtros de frecuencia).
   - Compilador JIT de scripts VFX a HLSL/C++ para Niagara.
 
-### 2.5 UAF-81.88 y Pipeline Portátil de Entrega UE5
+### 2.6 UAF-81.88 y Pipeline Portátil de Entrega UE5
 - **Paquetes:** `uaf.golden_slice`, `uaf.export`, plugin `UAFBridge`
 - **Responsabilidad:** Empaquetado, certificación automática contra 7 compuertas y exportación lista para Unreal.
 - **Salida:**
