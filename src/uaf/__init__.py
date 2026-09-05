@@ -3101,6 +3101,27 @@ from .interactive_audio import (
     UE5MetaSoundsExporter,
 )
 
+# Real-Time In-Engine Co-Piloting & Live Synchronization (UAF-81.95)
+from .copilot import (
+    CopilotSessionState,
+    SyncDirection,
+    CoPilotCommandType,
+    ConflictResolutionPolicy,
+    Vector3D,
+    Rotator3D,
+    Transform3D,
+    LiveActorSync,
+    TerrainRegionPatch,
+    CoPilotMessage,
+    CoPilotSessionMetrics,
+    serialize_message,
+    deserialize_message,
+    MessageBuilder,
+    CoPilotReconciler,
+    CoPilotDaemonServer,
+    UE5CoPilotListener,
+)
+
 __all__ = [
     "ProjectContext",
     "ExecutionContext",
@@ -5671,6 +5692,23 @@ __all__ = [
     "MetaSoundNodeSchema",
     "UE5MetaSoundsGraphManifest",
     "UE5MetaSoundsExporter",
+    "CopilotSessionState",
+    "SyncDirection",
+    "CoPilotCommandType",
+    "ConflictResolutionPolicy",
+    "Vector3D",
+    "Rotator3D",
+    "Transform3D",
+    "LiveActorSync",
+    "TerrainRegionPatch",
+    "CoPilotMessage",
+    "CoPilotSessionMetrics",
+    "serialize_message",
+    "deserialize_message",
+    "MessageBuilder",
+    "CoPilotReconciler",
+    "CoPilotDaemonServer",
+    "UE5CoPilotListener",
 ]
 
 

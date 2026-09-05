@@ -1,7 +1,7 @@
-# Guía Maestra de Arquitectura Next-Gen — AOE / UAF (Fases 81.88 a 81.94)
+# Guía Maestra de Arquitectura Next-Gen — AOE / UAF (Fases 81.88 a 81.95)
 
 **Documento:** Manual Técnico y Arquitectura de Integración  
-**Alcance:** Fases UAF-81.88 a UAF-81.94 + Pipeline Portátil de Entrega UE5  
+**Alcance:** Fases UAF-81.88 a UAF-81.95 + Pipeline Portátil de Entrega UE5  
 **Plataforma de Ejecución:** Headless Python 3.13 + Unreal Engine 5 (Windows)  
 
 ---
@@ -17,10 +17,11 @@ graph TD
     C --> D["UAF-81.92: IA Cognitiva GOAP & Escuadrones"]
     D --> E["UAF-81.93: Economía, Afijos & Loot GAS"]
     E --> F["UAF-81.94: Audio Interactivo & MetaSounds"]
-    F --> G["UAF-81.89: VFX Avanzados & Acoplamiento Fluido"]
-    G --> H["UAF-81.88: Certificación Autónoma Golden Slice"]
-    H --> I["UE5 Portable Delivery Pipeline (aoe export-bundle)"]
-    I --> J["Ingesta Desatendida en Unreal Engine 5 Editor"]
+    F --> G["UAF-81.95: Live Co-Piloting & Sincronización"]
+    G --> H["UAF-81.89: VFX Avanzados & Acoplamiento Fluido"]
+    H --> I["UAF-81.88: Certificación Autónoma Golden Slice"]
+    I --> J["UE5 Portable Delivery Pipeline (aoe export-bundle)"]
+    J --> K["Ingesta Desatendida en Unreal Engine 5 Editor"]
 ```
 
 ---
@@ -79,7 +80,16 @@ graph TD
   - `SpatialAttenuationCalculator`: Enforzamiento estricto de la Regla 10 ($\le 20\text{ m}$ para bucles de enemigos con volumen $0\text{ dB}$ en el exterior) y paneo estéreo binaural.
   - `UE5MetaSoundsExporter`: Exportación de grafos `.json` para MetaSounds Source Assets y presets de `USoundAttenuation`.
 
-### 2.6 UAF-81.89: Efectos Visuales Avanzados, Fluidos y Acoplamiento Ambiental
+### 2.6 UAF-81.95: Co-Pilotaje en Tiempo Real y Sincronización Bidireccional
+- **Paquete:** `uaf.copilot`
+- **Responsabilidad:** Puente interactivo continuo entre AOE y el viewport de Unreal Editor sin reiniciar el motor.
+- **Salida:**
+  - `CoPilotDaemonServer`: Servicio demonio ligero JSON-RPC en segundo plano para control en caliente.
+  - Sincronización de deltas de paisaje (`TerrainRegionPatch`), salas modulares WFC y spawners de escuadrones con latencia $< 500\text{ ms}$.
+  - `CoPilotReconciler`: Modelo de concurrencia determinista con `DESIGNER_LOCK_WINS` para proteger ajustes manuales de nivel frente a regeneraciones procedurales.
+  - `UE5CoPilotListener`: Hook de integración para el hilo principal de Unreal Editor vía Slate timers.
+
+### 2.7 UAF-81.89: Efectos Visuales Avanzados, Fluidos y Acoplamiento Ambiental
 - **Paquete:** `uaf.vfx_advanced`
 - **Responsabilidad:** Efectos ambientales interactivos y de partículas Niagara.
 - **Salida:**
@@ -92,7 +102,7 @@ graph TD
   - Acoplador espectral de audio a partículas (ADSR + filtros de frecuencia).
   - Compilador JIT de scripts VFX a HLSL/C++ para Niagara.
 
-### 2.7 UAF-81.88 y Pipeline Portátil de Entrega UE5
+### 2.8 UAF-81.88 y Pipeline Portátil de Entrega UE5
 - **Paquetes:** `uaf.golden_slice`, `uaf.export`, plugin `UAFBridge`
 - **Responsabilidad:** Empaquetado, certificación automática contra 7 compuertas y exportación lista para Unreal.
 - **Salida:**
