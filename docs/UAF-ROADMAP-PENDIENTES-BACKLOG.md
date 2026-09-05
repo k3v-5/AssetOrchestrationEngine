@@ -19,8 +19,8 @@ Este documento registra formalmente las fases estratégicas identificadas y pend
 | **UAF-81.97** | Procedural Cinematics, CineCamera Director & UE5 Sequencer | Encuadres dinámicos, Rule of Thirds, auto-DOF, LevelSequence | ✅ **COMPLETADO & CERTIFICADO** |
 | **UAF-81.98** | Procedural Quest Graph, Branching Narrative & Dialogue Trees | Diálogos ramificados, skill checks, reputación y CommonUI | ✅ **COMPLETADO & CERTIFICADO** |
 | **UAF-81.99** | Physics, Voronoi Fracturing & Chaos Destruction System | Fracturación Voronoi, UE5 Chaos GeometryCollection, escombros | ✅ **COMPLETADO & CERTIFICADO** |
-| **UAF-81.100** | Volumetric Weather Cycles, Dynamic Day/Night & Atmosphere | Ciclos día/noche, SkyAtmosphere, niebla volumétrica y shaders | Alta (Siguiente Objetivo) |
-| **UAF-81.101** | Studio Web UI & Local Interactive Visual Dashboard | Interfaz local FastAPI + WebGL/Three.js, visor 3D y 1-click | Alta |
+| **UAF-81.100** | Volumetric Weather Cycles, Dynamic Day/Night & Atmosphere | Ciclos día/noche, SkyAtmosphere, niebla volumétrica y shaders | ✅ **COMPLETADO & CERTIFICADO** |
+| **UAF-81.101** | Studio Web UI & Local Interactive Visual Dashboard | Interfaz local FastAPI + WebGL/Three.js, visor 3D y 1-click | Alta (Siguiente Objetivo) |
 | **UAF-81.102** | One-Click Full Vertical Slice Builder (Macro-Orchestrator) | Pipeline unificado de nivel completo listo para jugar en UE5 | Alta |
 
 ---
@@ -151,11 +151,18 @@ Integrar los biomas ecológicos de Whittaker (UAF-81.91) con la iluminación din
 
 ### 8.2 Componentes Arquitectónicos
 1. **Perfiles Atmosféricos por Bioma (`BiomeAtmosphereProfile`)**:
-   - Parámetros de `SkyAtmosphere`, `ExponentialHeightFog` y capas de `VolumetricCloud` calibrados para cada bioma (ventiscas polares, calimas desérticas, nieblas densas de pantano).
+   - Parámetros de `SkyAtmosphere`, `ExponentialHeightFog` y capas de `VolumetricCloud` calibrados para cada bioma (ventiscas polares, calimas desérticas, nieblas densas de pantano, etc.).
 2. **Controlador de Ciclo Día/Noche (`DayNightCycleController`)**:
    - Trayectoria celeste calculada con dispersión física de Rayleigh y Mie, iluminación lunar nocturna y curvas de exposición ocular adaptativa.
 3. **Shader Layering Climático Procedural (`EnvironmentalShaderBlender`)**:
    - Capas de material blend (*vertex color* y máscaras de altitud/pendiente) que aplican acumulación de nieve cenital, efectos de charcos y humedad de lluvia sobre todas las superficies del nivel.
+4. **Exportador UE5 (`UE5WeatherExporter`)**:
+   - Exportación de manifiestos JSON, curvas flotantes para Sequencer y scripts de automatización Python para Unreal Engine 5.
+
+### 8.3 Estado de Certificación y Verificación
+- **Paquete:** `src/uaf/weather_atmosphere/`
+- **Suite de Pruebas:** `tests/uaf/test_acceptance_uaf81_100.py` (16/16 tests PASS - 100%).
+- **Certificación:** ✅ **COMPLETADO & CERTIFICADO** sin regresiones en el framework global.
 
 ---
 

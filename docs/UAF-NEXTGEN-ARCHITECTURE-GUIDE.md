@@ -139,6 +139,16 @@ graph TD
   - Acoplador espectral de audio a partículas (ADSR + filtros de frecuencia).
   - Compilador JIT de scripts VFX a HLSL/C++ para Niagara.
 
+
+### 2.11 UAF-81.100: Ciclos Climáticos Volumétricos, Día/Noche Dinámico y Atmósfera
+- **Paquete:** `uaf.weather_atmosphere`
+- **Responsabilidad:** Integración de iluminación Lumen dinámica, trayectorias celestes físicas (sol y luna), dispersión de Rayleigh y Mie, niebla volumétrica y shader layering procedural ambiental.
+- **Salida:**
+  - `BiomeAtmosphereProfile`: Presets atmosféricos físicos para 8 biomas (`ARCTIC`, `TUNDRA`, `ALPINE`, `TEMPERATE_FOREST`, `DESERT`, `SWAMP`, `VOLCANIC`, `CYBERPUNK_NEON`).
+  - `DayNightCycleController`: Simulación celeste de 24 horas con atenuación de masa de aire de Kasten-Young, fotometría en Lux, temperatura de color Kelvin (Planck) y adaptación ocular EV100 asimétrica.
+  - `EnvironmentalShaderBlender`: Capas procedurales de material para lluvia/secado termodinámico, charcos reflectantes con aplanamiento de normales, acumulación de nieve cenital con corte en acantilados ($>50^\circ$), y parámetros de animación de follaje por viento.
+  - `UE5WeatherExporter`: Exportación de manifiestos JSON, canales de curvas continuas de 24 horas para Sequencer y scripts Python de automatización para UE5 Editor.
+
 ### 2.8 UAF-81.88 y Pipeline Portátil de Entrega UE5
 - **Paquetes:** `uaf.golden_slice`, `uaf.export`, plugin `UAFBridge`
 - **Responsabilidad:** Empaquetado, certificación automática contra 7 compuertas y exportación lista para Unreal.

@@ -3210,6 +3210,36 @@ from .chaos_destruction import (
     UE5ChaosExporter,
 )
 
+
+# Volumetric Weather Cycles, Dynamic Day/Night & Atmosphere (UAF-81.100)
+from .weather_atmosphere import (
+    WeatherBiomeType,
+    PrecipitationType,
+    CloudCoveragePreset,
+    SkyAtmosphereSpec,
+    ExponentialHeightFogSpec,
+    VolumetricCloudSpec,
+    BiomeAtmosphereProfile,
+    WeatherState,
+    SurfaceWeatherModifier,
+    MaterialParameterCollectionSpec,
+    DiurnalKeyframe,
+    WeatherSystemManifest,
+    BIOME_PROFILE_REGISTRY,
+    get_default_biome_profile,
+    create_arctic_profile,
+    create_tundra_profile,
+    create_alpine_profile,
+    create_temperate_forest_profile,
+    create_desert_profile,
+    create_swamp_profile,
+    create_volcanic_profile,
+    create_cyberpunk_neon_profile,
+    DayNightCycleController,
+    EnvironmentalShaderBlender,
+    UE5WeatherExporter,
+)
+
 __all__ = [
     "ProjectContext",
     "ExecutionContext",
@@ -5869,6 +5899,31 @@ __all__ = [
     "ChaosGeometryCollectionCompiler",
     "DebrisFieldEmitter",
     "UE5ChaosExporter",
+    "WeatherBiomeType",
+    "PrecipitationType",
+    "CloudCoveragePreset",
+    "SkyAtmosphereSpec",
+    "ExponentialHeightFogSpec",
+    "VolumetricCloudSpec",
+    "BiomeAtmosphereProfile",
+    "WeatherState",
+    "SurfaceWeatherModifier",
+    "MaterialParameterCollectionSpec",
+    "DiurnalKeyframe",
+    "WeatherSystemManifest",
+    "BIOME_PROFILE_REGISTRY",
+    "get_default_biome_profile",
+    "create_arctic_profile",
+    "create_tundra_profile",
+    "create_alpine_profile",
+    "create_temperate_forest_profile",
+    "create_desert_profile",
+    "create_swamp_profile",
+    "create_volcanic_profile",
+    "create_cyberpunk_neon_profile",
+    "DayNightCycleController",
+    "EnvironmentalShaderBlender",
+    "UE5WeatherExporter",
 ]
 
 
