@@ -107,6 +107,15 @@ def apply_inverted_hull(obj, outline_config):
     return outline_obj
 
 def apply_semantic_materials(obj, appearance, regions):
+    # Support dict or list representation of semantic regions
+    if isinstance(regions, list):
+        # Convert to dict for uniform handling
+        regions_dict = {}
+        for r in regions:
+            if isinstance(r, dict) and "region_id" in r:
+                regions_dict[r["region_id"]] = r
+        regions = regions_dict
+
     # Setup vertex groups based on semantic regions
     for region_id, data in regions.items():
         indices = data.get("vertex_indices", []) if isinstance(data, dict) else []
@@ -171,6 +180,144 @@ def extract_scene_report():
 
     return report
 
+
+def construct_humanoid_mesh_and_rig(asset, obj_name):
+    # This acts as the Character Fabricator in Blender
+    skeleton = asset.get("skeleton", {})
+    if not skeleton:
+        # Fallback to Suzanne
+        bpy.ops.mesh.primitive_monkey_add(size=2, enter_editmode=False, align='WORLD', location=(0, 0, 0))
+        obj = bpy.context.active_object
+        obj.name = obj_name
+
+        # We need a basic armature even for Suzanne fallback if testing poses
+        bpy.ops.object.armature_add(location=(0, 0, 0))
+        armature = bpy.context.active_object
+        armature.name = f"{obj_name}_Armature"
+
+        # Parent
+        obj.select_set(True)
+        armature.select_set(True)
+        bpy.context.view_layer.objects.active = armature
+        bpy.ops.object.parent_set(type='ARMATURE_AUTO')
+
+        return obj, armature
+
+    logging.info(f"Constructing real Character Armature & Skinning for {obj_name}")
+
+    # 1. Create Armature
+    bpy.ops.object.armature_add(enter_editmode=True, align='WORLD', location=(0, 0, 0))
+    armature = bpy.context.active_object
+    armature.name = f"{obj_name}_Armature"
+    amt = armature.data
+
+    # Clear default bone
+    bpy.ops.armature.select_all(action='SELECT')
+    bpy.ops.armature.delete()
+
+    # Create bones from SkeletonIR
+    bones = skeleton.get("bones", {})
+    created_bones = {}
+    for bone_id, bone_data in bones.items():
+        eb = amt.edit_bones.new(bone_id)
+        eb.head = bone_data.get("head", (0,0,0))
+        eb.tail = bone_data.get("tail", (0,0,1))
+        eb.roll = bone_data.get("roll", 0)
+        created_bones[bone_id] = eb
+
+    for bone_id, bone_data in bones.items():
+        parent_id = bone_data.get("parent")
+        if parent_id and parent_id in created_bones:
+            created_bones[bone_id].parent = created_bones[parent_id]
+            created_bones[bone_id].use_connect = False
+
+    bpy.ops.object.mode_set(mode='OBJECT')
+
+    # 2. Create programmatic humanoid mesh
+    import bmesh
+    bm = bmesh.new()
+
+    vertex_groups_weights = {} # bone_id -> [(vertex_idx, weight)]
+
+    # Build limbs as cylinders along bones
+    vert_idx_counter = 0
+    for bone_id, bone_data in bones.items():
+        head = bone_data.get("head", (0,0,0))
+        tail = bone_data.get("tail", (0,0,1))
+
+        # Simple geometric representation
+        from mathutils import Vector
+        v1 = Vector(head)
+        v2 = Vector(tail)
+        direction = v2 - v1
+        length = direction.length
+
+        if length < 0.01:
+            continue
+
+        # Draw a box between head and tail
+        import math
+        thickness = 0.15 if 'spine' in bone_id or 'pelvis' in bone_id else 0.08
+        if 'head' in bone_id: thickness = 0.25
+
+        # Add simple cube
+        bmesh.ops.create_cube(bm, size=thickness * 2)
+        geom = bm.verts[-8:] # Last 8 verts
+
+        # Transform cube to span bone
+        midpoint = (v1 + v2) / 2
+        rot_quat = direction.to_track_quat('Z', 'Y')
+
+        for v in geom:
+            v.co.z = (v.co.z * (length / (thickness*2))) # Scale Z to length
+            v.co.rotate(rot_quat)
+            v.co += midpoint
+
+            # Skinning map
+            if bone_id not in vertex_groups_weights:
+                vertex_groups_weights[bone_id] = []
+            vertex_groups_weights[bone_id].append(v.index)
+
+        # Semantics
+        if 'head' in bone_id or 'neck' in bone_id:
+            sem_tag = "FACE"
+        elif 'arm' in bone_id or 'hand' in bone_id:
+            sem_tag = "SKIN"
+        elif 'thigh' in bone_id or 'shin' in bone_id:
+            sem_tag = "BODY"
+        else:
+            sem_tag = "BODY"
+
+        if "semantic_map" not in asset: asset["semantic_map"] = {}
+        if sem_tag not in asset["semantic_map"]: asset["semantic_map"][sem_tag] = []
+        asset["semantic_map"][sem_tag].extend([v.index for v in geom])
+
+    mesh = bpy.data.meshes.new(f"{obj_name}_Mesh")
+    bm.to_mesh(mesh)
+    bm.free()
+
+    obj = bpy.data.objects.new(obj_name, mesh)
+    bpy.context.collection.objects.link(obj)
+
+    # 3. Apply Skinning
+    for bone_id, verts in vertex_groups_weights.items():
+        vg = obj.vertex_groups.new(name=bone_id)
+        vg.add(verts, 1.0, 'REPLACE')
+
+    # Parent and Armature modifier
+    mod = obj.modifiers.new(name="Armature", type='ARMATURE')
+    mod.object = armature
+    obj.parent = armature
+
+    bpy.ops.object.select_all(action='DESELECT')
+    obj.select_set(True)
+    bpy.context.view_layer.objects.active = obj
+
+    # Smoothness
+    bpy.ops.object.shade_smooth()
+
+    return obj, armature
+
 def main():
     try:
         args_str = os.environ.get("AOE_BLENDER_ARGS", "{}")
@@ -181,21 +328,21 @@ def main():
         family = appearance.get("family", "PBR")
         style = appearance.get("style", {})
 
-        logging.info(f"AssetIR received: {asset.get('asset_id')}")
+        logging.info(f"AssetIR/CharacterIR received: {asset.get('asset_id', asset.get('character_id'))}")
         logging.info(f"Appearance resolved: {family}")
         logging.info("Blender launched")
 
-        # 1. Create Base Geometry (Monkey/Suzanne as test base if not specified)
-        bpy.ops.mesh.primitive_monkey_add(size=2, enter_editmode=False, align='WORLD', location=(0, 0, 0))
-        obj = bpy.context.active_object
-        obj.name = asset.get("asset_id", "AOE_Asset")
-        logging.info(f"Scene created with base geometry: {obj.name}")
+        # 1. Create Geometry
+        obj_name = asset.get("asset_id", asset.get("character_id", "AOE_Asset"))
+        obj, armature = construct_humanoid_mesh_and_rig(asset, obj_name)
 
         # Apply Subdivision Surface for smoothness
         subsurf = obj.modifiers.new(name="Subsurf", type='SUBSURF')
         subsurf.levels = 2
         subsurf.render_levels = 2
         bpy.ops.object.modifier_apply(modifier="Subsurf")
+
+        logging.info(f"Scene created with base geometry: {obj.name}")
 
         # 2. Shading setup
         shading_conf = style.get("shading", {}) if isinstance(style, dict) else {}

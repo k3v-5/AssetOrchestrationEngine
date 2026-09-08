@@ -47,7 +47,9 @@ class TestBackends(unittest.TestCase):
         pbr_res = backend.export_asset(self.pbr_asset)
         self.assertEqual(pbr_res["master_material"], "/Engine/MasterMaterials/M_PBR_Master")
 
-        # Test NPR
+        # Test NPR - Since NPR uses INVERTED_HULL and Unreal lacks it, it must fail or we must disable the outline for the test.
+        from src.aoe_ir.appearance import OutlineMethod
+        self.npr_asset.appearance.style.outline.method = OutlineMethod.POST_PROCESS
         npr_res = backend.export_asset(self.npr_asset)
         self.assertEqual(npr_res["master_material"], "/Engine/MasterMaterials/M_NPR_Anime_Master")
 

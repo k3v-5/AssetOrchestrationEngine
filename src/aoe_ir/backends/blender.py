@@ -57,7 +57,7 @@ class BlenderBackend(RenderBackend):
             try:
                 result = runner.run_script(self.executor_script, args)
                 result["backend"] = self.get_backend_name()
-                result["asset_id"] = asset.asset_id
+                result["asset_id"] = getattr(asset, "asset_id", getattr(asset, "character_id", "Unknown"))
                 return result
             except RuntimeError as e:
                 return {"status": "FAILED", "error": str(e)}
