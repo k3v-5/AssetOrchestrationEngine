@@ -36,9 +36,10 @@ class TestAssetGenerationIntegration(unittest.TestCase):
             self.assertEqual(result["status"], "SUCCESS", result.get("error", ""))
             self.assertTrue(os.path.exists(blend_path))
 
-            # Verify the material was added to the result
-            self.assertTrue(any("MonkeyToon_Toon" in mat for mat in result.get("materials", [])), "Toon material not created in Blender")
-            self.assertIn("MonkeyToon", result.get("objects", []))
+            # Verify via deep scene report
+            report = result.get("scene_report", {})
+            self.assertIn("MonkeyToon", report.get("objects", []))
+            self.assertTrue(any("MonkeyToon_Toon" in mat for mat in report.get("materials", [])), "Toon material not created in Blender")
 
     def test_inverted_hull_real(self):
         # CUARTO TEST: INVERTED HULL REAL
@@ -60,8 +61,13 @@ class TestAssetGenerationIntegration(unittest.TestCase):
 
             self.assertEqual(result["status"], "SUCCESS")
 
+            report = result.get("scene_report", {})
             # The outline object should exist physically in Blender
-            self.assertIn("MonkeyOutline_Outline", result.get("objects", []))
+            self.assertIn("MonkeyOutline_Outline", report.get("objects", []))
+            # The modifier should be present
+            self.assertIn("Outline_Solidify", report.get("modifiers", {}).get("MonkeyOutline_Outline", []))
+            # Outline material exists
+            self.assertIn("Mat_Outline", report.get("materials", []))
 
     def test_semantic_regions_real(self):
         # QUINTO TEST: SEMANTIC REGIONS
@@ -73,7 +79,7 @@ class TestAssetGenerationIntegration(unittest.TestCase):
                 family=AppearanceFamily.NPR,
                 style=StyleProfile(shading=ShadingProfile(model=ShaderModel.TOON)),
                 region_overrides={
-                    "FACE": StyleProfile(style_type=StyleProfileType.ANIME)
+                    "FACE": StyleProfile(style_type="ANIME")
                 }
             )
         )
@@ -81,7 +87,11 @@ class TestAssetGenerationIntegration(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmpdir:
             result = self.backend.export_asset(asset, filepath=os.path.join(tmpdir, "semantic.blend"))
             self.assertEqual(result["status"], "SUCCESS")
-            # In a real check we'd verify the assigned vertex groups and materials from Blender's stdout
+
+            report = result.get("scene_report", {})
+            # Should have the base toon material AND the FACE override material
+            self.assertTrue(any("Mat_MonkeySemantic_Toon" in mat for mat in report.get("materials", [])))
+            self.assertTrue(any("Mat_MonkeySemantic_FACE_Override" in mat for mat in report.get("materials", [])))
 
     def test_pbr_regression_real(self):
         # SEXTO TEST: PBR REGRESSION
@@ -100,6 +110,9 @@ class TestAssetGenerationIntegration(unittest.TestCase):
 
             self.assertEqual(result["status"], "SUCCESS")
             self.assertTrue(os.path.exists(blend_path))
+
+            report = result.get("scene_report", {})
+            self.assertTrue(any("Mat_MonkeyPBR_PBR" in mat for mat in report.get("materials", [])))
 
 if __name__ == "__main__":
     unittest.main()

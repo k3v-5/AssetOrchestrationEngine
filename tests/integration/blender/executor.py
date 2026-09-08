@@ -4,6 +4,9 @@ import bpy
 import json
 import os
 import sys
+import logging
+
+logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
 
 def create_toon_basic_material(mat_name, shading_config):
     mat = bpy.data.materials.new(name=mat_name)
@@ -22,13 +25,13 @@ def create_toon_basic_material(mat_name, shading_config):
     color_ramp = nodes.new("ShaderNodeValToRGB")
 
     color_ramp.color_ramp.interpolation = 'CONSTANT'
-    band_count = shading_config.get("band_count", 2)
+    band_count = shading_config.get("band_count", 2) if isinstance(shading_config, dict) else 2
 
     # Adjust bands
     while len(color_ramp.color_ramp.elements) < band_count:
         color_ramp.color_ramp.elements.new(0.5)
 
-    threshold = shading_config.get("shadow_threshold", 0.5)
+    threshold = shading_config.get("shadow_threshold", 0.5) if isinstance(shading_config, dict) else 0.5
     if band_count >= 2:
         color_ramp.color_ramp.elements[0].position = 0.0
         # Hex color to RGBA (approx for test)
@@ -43,6 +46,13 @@ def create_toon_basic_material(mat_name, shading_config):
 
     return mat
 
+def create_pbr_material(mat_name):
+    """Creates a basic PBR material using Principled BSDF."""
+    mat = bpy.data.materials.new(name=mat_name)
+    mat.use_nodes = True
+    # The default node tree already has a Principled BSDF and Material Output
+    return mat
+
 def apply_inverted_hull(obj, outline_config):
     # Duplicate object
     bpy.ops.object.select_all(action='DESELECT')
@@ -55,7 +65,7 @@ def apply_inverted_hull(obj, outline_config):
 
     # Add Solidify modifier
     mod = outline_obj.modifiers.new(name="Outline_Solidify", type='SOLIDIFY')
-    mod.thickness = outline_config.get("width", 0.015)
+    mod.thickness = outline_config.get("width", 0.015) if isinstance(outline_config, dict) else 0.015
     mod.offset = 1.0 # Inflate outwards
     mod.use_flip_normals = True
 
@@ -84,82 +94,153 @@ def apply_inverted_hull(obj, outline_config):
 
 def apply_semantic_materials(obj, appearance, regions):
     # Setup vertex groups based on semantic regions
-    if not obj.data.vertex_colors:
-        obj.data.vertex_colors.new()
+    for region_id, data in regions.items():
+        indices = data.get("vertex_indices", []) if isinstance(data, dict) else []
+        if indices:
+            vg = obj.vertex_groups.new(name=region_id)
+            vg.add(indices, 1.0, 'REPLACE')
+            logging.info(f"Created vertex group {region_id} with {len(indices)} vertices")
 
-    for region_id, indices in regions.items():
-        vg = obj.vertex_groups.new(name=region_id)
-        vg.add(indices, 1.0, 'REPLACE')
+    overrides = appearance.get("region_overrides", {}) if isinstance(appearance, dict) else {}
+    if overrides:
+        for region_id, style_override in overrides.items():
+            if region_id in regions:
+                logging.info(f"Applying style override for semantic region: {region_id}")
 
-    # Example logic: if "FACE" is overridden, create a specific material
-    if "FACE" in appearance.get("region_overrides", {}) and "FACE" in regions:
-        # Create face material and assign
-        pass # Simplified for the executor skeleton
+                mat_name = f"Mat_{obj.name}_{region_id}_Override"
+                shading_conf = style_override.get("shading", {}) if isinstance(style_override, dict) else {}
+                override_mat = create_toon_basic_material(mat_name, shading_conf)
 
-def main():
-    args_str = os.environ.get("AOE_BLENDER_ARGS", "{}")
-    args = json.loads(args_str)
+                obj.data.materials.append(override_mat)
+                mat_index = len(obj.data.materials) - 1
 
-    asset = args.get("asset", {})
-    appearance = asset.get("appearance", {})
-    family = appearance.get("family", "PBR")
-    style = appearance.get("style", {})
+                # In headless, using bmesh is safer than bpy.ops for edit mode selections
+                import bmesh
+                bm = bmesh.new()
+                bm.from_mesh(obj.data)
 
-    # 1. Create Base Geometry (Monkey/Suzanne as test base if not specified)
-    bpy.ops.mesh.primitive_monkey_add(size=2, enter_editmode=False, align='WORLD', location=(0, 0, 0))
-    obj = bpy.context.active_object
-    obj.name = asset.get("asset_id", "AOE_Asset")
+                deform_layer = bm.verts.layers.deform.verify()
+                vg = obj.vertex_groups.get(region_id)
 
-    # Apply Subdivision Surface for smoothness
-    subsurf = obj.modifiers.new(name="Subsurf", type='SUBSURF')
-    subsurf.levels = 2
-    subsurf.render_levels = 2
-    bpy.ops.object.modifier_apply(modifier="Subsurf")
+                if vg:
+                    vg_index = vg.index
+                    for face in bm.faces:
+                        # Check if all vertices of the face belong to the vertex group
+                        is_in_group = True
+                        for vert in face.verts:
+                            if vg_index not in vert[deform_layer]:
+                                is_in_group = False
+                                break
 
-    result_data = {
-        "status": "SUCCESS",
-        "objects": [obj.name],
-        "materials": [],
-        "modifiers": []
+                        if is_in_group:
+                            face.material_index = mat_index
+
+                bm.to_mesh(obj.data)
+                bm.free()
+
+def extract_scene_report():
+    report = {
+        "objects": [obj.name for obj in bpy.data.objects],
+        "materials": [mat.name for mat in bpy.data.materials],
+        "meshes": [mesh.name for mesh in bpy.data.meshes],
+        "modifiers": {},
+        "node_groups": [ng.name for ng in bpy.data.node_groups]
     }
 
-    # 2. Shading setup
-    if family == "NPR" and style.get("shading", {}).get("model") == "TOON":
-        mat = create_toon_basic_material(f"Mat_{obj.name}_Toon", style.get("shading", {}))
-        obj.data.materials.append(mat)
-        result_data["materials"].append(mat.name)
+    for obj in bpy.data.objects:
+        if obj.modifiers:
+            report["modifiers"][obj.name] = [mod.name for mod in obj.modifiers]
 
-    # 3. Outline setup
-    outline_conf = style.get("outline", {})
-    if family == "NPR" and outline_conf.get("enabled", False) and outline_conf.get("method") == "INVERTED_HULL":
-        outline_obj = apply_inverted_hull(obj, outline_conf)
-        result_data["objects"].append(outline_obj.name)
+    return report
 
-    # 4. Semantic Regions setup
-    semantic_regions = asset.get("semantic_regions", {})
-    if semantic_regions:
-        apply_semantic_materials(obj, appearance, semantic_regions)
+def main():
+    try:
+        args_str = os.environ.get("AOE_BLENDER_ARGS", "{}")
+        args = json.loads(args_str)
 
-    # Render if path is provided
-    render_path = args.get("render_path")
-    if render_path:
-        # Basic camera and light
-        bpy.ops.object.camera_add(location=(0, -6, 1), rotation=(1.2, 0, 0))
-        cam = bpy.context.active_object
-        bpy.context.scene.camera = cam
+        asset = args.get("asset", {})
+        appearance = asset.get("appearance", {})
+        family = appearance.get("family", "PBR")
+        style = appearance.get("style", {})
 
-        bpy.ops.object.light_add(type='SUN', location=(0, 0, 5), rotation=(0.5, 0.5, 0))
+        logging.info(f"AssetIR received: {asset.get('asset_id')}")
+        logging.info(f"Appearance resolved: {family}")
+        logging.info("Blender launched")
 
-        bpy.context.scene.render.engine = 'BLENDER_EEVEE_NEXT' if hasattr(bpy.types.SceneEEVEE, 'TAA_samples') else 'BLENDER_EEVEE'
-        bpy.context.scene.render.filepath = render_path
-        bpy.ops.render.render(write_still=True)
+        # 1. Create Base Geometry (Monkey/Suzanne as test base if not specified)
+        bpy.ops.mesh.primitive_monkey_add(size=2, enter_editmode=False, align='WORLD', location=(0, 0, 0))
+        obj = bpy.context.active_object
+        obj.name = asset.get("asset_id", "AOE_Asset")
+        logging.info(f"Scene created with base geometry: {obj.name}")
 
-    # Save .blend
-    filepath = args.get("filepath")
-    if filepath:
-        bpy.ops.wm.save_as_mainfile(filepath=filepath)
+        # Apply Subdivision Surface for smoothness
+        subsurf = obj.modifiers.new(name="Subsurf", type='SUBSURF')
+        subsurf.levels = 2
+        subsurf.render_levels = 2
+        bpy.ops.object.modifier_apply(modifier="Subsurf")
 
-    print(f"AOE_RESULT:{json.dumps(result_data)}")
+        # 2. Shading setup
+        shading_conf = style.get("shading", {}) if isinstance(style, dict) else {}
+        if "NPR" in str(family) or family == "NPR" or "AppearanceFamily.NPR" in str(family):
+            mat = create_toon_basic_material(f"Mat_{obj.name}_Toon", shading_conf)
+            obj.data.materials.append(mat)
+            logging.info(f"Material created (TOON_BASIC): {mat.name}")
+        elif "PBR" in str(family) or family == "PBR" or "AppearanceFamily.PBR" in str(family):
+            mat = create_pbr_material(f"Mat_{obj.name}_PBR")
+            obj.data.materials.append(mat)
+            logging.info(f"Material created (PBR): {mat.name}")
+
+        # 3. Outline setup
+        outline_conf = style.get("outline", {}) if isinstance(style, dict) else {}
+        if outline_conf.get("enabled", False):
+            outline_obj = apply_inverted_hull(obj, outline_conf)
+            logging.info(f"Outline created: {outline_obj.name}")
+
+        # 4. Semantic Regions setup
+        semantic_regions = asset.get("semantic_regions", {})
+        if semantic_regions:
+            apply_semantic_materials(obj, appearance, semantic_regions)
+
+        # Extract Deep Report
+        report = extract_scene_report()
+
+        # Render if path is provided
+        render_path = args.get("render_path")
+        if render_path:
+            logging.info("Render started")
+            # Basic camera and light
+            bpy.ops.object.camera_add(location=(0, -6, 1), rotation=(1.2, 0, 0))
+            cam = bpy.context.active_object
+            bpy.context.scene.camera = cam
+
+            bpy.ops.object.light_add(type='SUN', location=(0, 0, 5), rotation=(0.5, 0.5, 0))
+
+            bpy.context.scene.render.engine = 'BLENDER_EEVEE_NEXT' if hasattr(bpy.types.SceneEEVEE, 'TAA_samples') else 'BLENDER_EEVEE'
+            bpy.context.scene.render.filepath = render_path
+            bpy.ops.render.render(write_still=True)
+            logging.info("Render completed")
+
+        # Save .blend
+        filepath = args.get("filepath")
+        if filepath:
+            bpy.ops.wm.save_as_mainfile(filepath=filepath)
+
+        logging.info("Validation completed")
+
+        result_data = {
+            "status": "SUCCESS",
+            "scene_report": report
+        }
+
+        print(f"AOE_RESULT:{json.dumps(result_data)}")
+    except Exception as e:
+        import traceback
+        result_data = {
+            "status": "FAILED",
+            "error": str(e),
+            "traceback": traceback.format_exc()
+        }
+        print(f"AOE_RESULT:{json.dumps(result_data)}")
 
 if __name__ == "__main__":
     main()
