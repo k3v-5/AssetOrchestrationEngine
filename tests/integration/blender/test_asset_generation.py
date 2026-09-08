@@ -73,13 +73,20 @@ class TestAssetGenerationIntegration(unittest.TestCase):
         # QUINTO TEST: SEMANTIC REGIONS
         asset = AssetIR(
             asset_id="MonkeySemantic",
-            semantic_regions={"FACE": SemanticRegionIR("FACE", vertex_indices=[0, 1, 2])},
+            semantic_regions={
+                "FACE": SemanticRegionIR("FACE", vertex_indices=[0, 1, 2]),
+                "HAIR": SemanticRegionIR("HAIR", vertex_indices=[3, 4, 5]),
+                "EYES": SemanticRegionIR("EYES", vertex_indices=[6, 7]),
+                "BODY": SemanticRegionIR("BODY", vertex_indices=[8, 9, 10])
+            },
             appearance=AppearanceProfile(
                 appearance_id="toon_semantic",
                 family=AppearanceFamily.NPR,
-                style=StyleProfile(shading=ShadingProfile(model=ShaderModel.TOON)),
+                style=StyleProfile(shading=ShadingProfile(model=ShaderModel.TOON, band_count=4)),
                 region_overrides={
-                    "FACE": StyleProfile(style_type="ANIME")
+                    "FACE": StyleProfile(style_type="ANIME", shading=ShadingProfile(model=ShaderModel.TOON, band_count=2)),
+                    "HAIR": StyleProfile(style_type="ANIME", shading=ShadingProfile(model=ShaderModel.TOON, band_count=3)),
+                    "EYES": StyleProfile(style_type="ANIME", shading=ShadingProfile(model=ShaderModel.TOON, band_count=2))
                 }
             )
         )
@@ -89,9 +96,12 @@ class TestAssetGenerationIntegration(unittest.TestCase):
             self.assertEqual(result["status"], "SUCCESS")
 
             report = result.get("scene_report", {})
-            # Should have the base toon material AND the FACE override material
-            self.assertTrue(any("Mat_MonkeySemantic_Toon" in mat for mat in report.get("materials", [])))
-            self.assertTrue(any("Mat_MonkeySemantic_FACE_Override" in mat for mat in report.get("materials", [])))
+            # Should have the base toon material AND ALL the override materials
+            materials = report.get("materials", [])
+            self.assertTrue(any("Mat_MonkeySemantic_Toon" in mat for mat in materials))
+            self.assertTrue(any("Mat_MonkeySemantic_FACE_Override" in mat for mat in materials))
+            self.assertTrue(any("Mat_MonkeySemantic_HAIR_Override" in mat for mat in materials))
+            self.assertTrue(any("Mat_MonkeySemantic_EYES_Override" in mat for mat in materials))
 
     def test_pbr_regression_real(self):
         # SEXTO TEST: PBR REGRESSION

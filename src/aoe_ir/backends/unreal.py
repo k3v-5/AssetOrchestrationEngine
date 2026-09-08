@@ -1,4 +1,4 @@
-from .base import RenderBackend
+from .base import RenderBackend, BackendCapabilities
 from ..asset import AssetIR
 from ..scene import SceneIR
 from typing import Dict, Any
@@ -8,7 +8,19 @@ class UnrealBackend(RenderBackend):
     def get_backend_name(self) -> str:
         return "UNREAL_ENGINE_5"
 
-    def export_asset(self, asset: AssetIR) -> Dict[str, Any]:
+    def get_capabilities(self) -> BackendCapabilities:
+        return BackendCapabilities(
+            pbr=True,
+            toon=True,
+            inverted_hull=False, # Unreal usually does post-process outline
+            semantic_overrides=True,
+            stencil=True,
+            post_process_outline=True,
+            animation_deformation=True
+        )
+
+    def export_asset(self, asset: AssetIR, **kwargs) -> Dict[str, Any]:
+        self.check_capabilities(asset)
         """Translates the AssetIR to a .uasset / Material Instance representation."""
         result = {
             "status": "SUCCESS",
@@ -18,7 +30,7 @@ class UnrealBackend(RenderBackend):
         }
         return result
 
-    def export_scene(self, scene: SceneIR) -> Dict[str, Any]:
+    def export_scene(self, scene: SceneIR, **kwargs) -> Dict[str, Any]:
         return {"status": "SUCCESS", "scene_id": scene.scene_id}
 
     def _resolve_master_material(self, asset: AssetIR) -> str:

@@ -1,7 +1,7 @@
 import os
 import dataclasses
 import json
-from .base import RenderBackend
+from .base import RenderBackend, BackendCapabilities
 from ..asset import AssetIR
 from ..scene import SceneIR
 from typing import Dict, Any, Optional
@@ -26,7 +26,20 @@ class BlenderBackend(RenderBackend):
     def get_backend_name(self) -> str:
         return "BLENDER_RUNTIME"
 
+    def get_capabilities(self) -> BackendCapabilities:
+        return BackendCapabilities(
+            pbr=True,
+            toon=True,
+            inverted_hull=True,
+            semantic_overrides=True,
+            stencil=False,
+            post_process_outline=False,  # Not implemented in executor yet
+            animation_deformation=True
+        )
+
     def export_asset(self, asset: AssetIR, **kwargs) -> Dict[str, Any]:
+        self.check_capabilities(asset)
+
         """Translates the AssetIR to a .blend file using the real Blender Executor if enabled."""
 
         if self.use_real_executor and self.executor_script:

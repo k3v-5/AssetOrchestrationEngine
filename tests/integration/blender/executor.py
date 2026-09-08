@@ -32,12 +32,26 @@ def create_toon_basic_material(mat_name, shading_config):
         color_ramp.color_ramp.elements.new(0.5)
 
     threshold = shading_config.get("shadow_threshold", 0.5) if isinstance(shading_config, dict) else 0.5
-    if band_count >= 2:
-        color_ramp.color_ramp.elements[0].position = 0.0
-        # Hex color to RGBA (approx for test)
-        color_ramp.color_ramp.elements[0].color = (0.2, 0.2, 0.3, 1.0) # Shadow Color
+
+    # Simple distribution of bands based on count
+    color_ramp.color_ramp.elements[0].position = 0.0
+    color_ramp.color_ramp.elements[0].color = (0.1, 0.1, 0.2, 1.0) # Darkest Shadow
+
+    if band_count == 2:
         color_ramp.color_ramp.elements[1].position = threshold
-        color_ramp.color_ramp.elements[1].color = (0.8, 0.8, 0.9, 1.0) # Highlight Color
+        color_ramp.color_ramp.elements[1].color = (0.8, 0.8, 0.9, 1.0) # Highlight
+    elif band_count == 3:
+        color_ramp.color_ramp.elements[1].position = threshold * 0.7
+        color_ramp.color_ramp.elements[1].color = (0.4, 0.4, 0.5, 1.0) # Midtone
+        color_ramp.color_ramp.elements[2].position = threshold * 1.3 if threshold * 1.3 <= 1.0 else 1.0
+        color_ramp.color_ramp.elements[2].color = (0.9, 0.9, 1.0, 1.0) # Highlight
+    elif band_count >= 4:
+        color_ramp.color_ramp.elements[1].position = threshold * 0.5
+        color_ramp.color_ramp.elements[1].color = (0.3, 0.3, 0.4, 1.0) # Core shadow
+        color_ramp.color_ramp.elements[2].position = threshold
+        color_ramp.color_ramp.elements[2].color = (0.6, 0.6, 0.7, 1.0) # Midtone
+        color_ramp.color_ramp.elements[3].position = threshold * 1.5 if threshold * 1.5 <= 1.0 else 1.0
+        color_ramp.color_ramp.elements[3].color = (0.95, 0.95, 1.0, 1.0) # Highlight
 
     # Links
     links.new(bsdf.outputs['BSDF'], shader_to_rgb.inputs['Shader'])
@@ -140,6 +154,10 @@ def apply_semantic_materials(obj, appearance, regions):
 
 def extract_scene_report():
     report = {
+        "environment": {
+            "blender_version": ".".join(map(str, bpy.app.version)),
+            "engine": 'BLENDER_EEVEE_NEXT' if hasattr(bpy.types.SceneEEVEE, 'TAA_samples') else 'BLENDER_EEVEE',
+        },
         "objects": [obj.name for obj in bpy.data.objects],
         "materials": [mat.name for mat in bpy.data.materials],
         "meshes": [mesh.name for mesh in bpy.data.meshes],
@@ -201,6 +219,61 @@ def main():
         if semantic_regions:
             apply_semantic_materials(obj, appearance, semantic_regions)
 
+
+        # Test Rigging Injection for Deformation Outline tests
+        if "test_rig_pose" in asset.get("metadata", {}):
+            pose_angle = asset.get("metadata")["test_rig_pose"]
+            logging.info(f"Applying test armature deformation with angle {pose_angle}")
+
+            # Select the original object (it should be the active one right now or outline_obj)
+            bpy.context.view_layer.objects.active = obj
+
+            # Create a simple armature
+            bpy.ops.object.armature_add(location=(0, 0, 0))
+            armature = bpy.context.active_object
+
+            # Select mesh then armature and parent with automatic weights
+            obj.select_set(True)
+            armature.select_set(True)
+            bpy.context.view_layer.objects.active = armature
+            bpy.ops.object.parent_set(type='ARMATURE_AUTO')
+
+            # Also parent the outline if it exists
+            if outline_conf.get("enabled", False):
+                # Deselect all
+                bpy.ops.object.select_all(action='DESELECT')
+                outline_obj.select_set(True)
+                armature.select_set(True)
+                bpy.context.view_layer.objects.active = armature
+                # Important: Outline should ideally share the same vertex groups
+                # Since we duplicated after subsurf but before armature in this script, it has no weights yet
+                # For this test, we'll bind it too
+                bpy.ops.object.parent_set(type='ARMATURE_AUTO')
+
+                # VERY IMPORTANT: Solidify must happen AFTER Armature modifier for outline to inflate deformed mesh correctly
+                # Reorder modifiers on outline
+                # 1. Armature
+                # 2. Outline_Solidify
+                bpy.ops.object.select_all(action='DESELECT')
+                outline_obj.select_set(True)
+                bpy.context.view_layer.objects.active = outline_obj
+                # The parent_set adds an Armature modifier at the end. We need to move it up.
+                bpy.ops.object.modifier_move_to_index(modifier="Armature", index=0)
+
+
+            # Pose it
+
+            # Select armature to enter pose mode
+            bpy.ops.object.select_all(action='DESELECT')
+            armature.select_set(True)
+            bpy.context.view_layer.objects.active = armature
+            bpy.ops.object.mode_set(mode='POSE')
+
+            pbone = armature.pose.bones[0]
+            pbone.rotation_mode = 'XYZ'
+            pbone.rotation_euler = (pose_angle, 0, 0)
+            bpy.ops.object.mode_set(mode='OBJECT')
+
         # Extract Deep Report
         report = extract_scene_report()
 
@@ -213,7 +286,8 @@ def main():
             cam = bpy.context.active_object
             bpy.context.scene.camera = cam
 
-            bpy.ops.object.light_add(type='SUN', location=(0, 0, 5), rotation=(0.5, 0.5, 0))
+            light_loc = asset.get("metadata", {}).get("test_light_loc", (0, 0, 5))
+            bpy.ops.object.light_add(type='SUN', location=light_loc, rotation=(0.5, 0.5, 0))
 
             bpy.context.scene.render.engine = 'BLENDER_EEVEE_NEXT' if hasattr(bpy.types.SceneEEVEE, 'TAA_samples') else 'BLENDER_EEVEE'
             bpy.context.scene.render.filepath = render_path
