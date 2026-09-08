@@ -3,7 +3,8 @@ import os
 import tempfile
 import hashlib
 from src.aoe_ir.asset import AssetIR
-from src.aoe_ir.appearance import AppearanceProfile, AppearanceFamily, StyleProfile, ShadingProfile, ShaderModel
+from src.aoe_ir.appearance import AppearanceProfile, AppearanceFamily, StyleProfile, ShadingProfile, ShaderModel, RimLightProfile
+from src.aoe_ir.style_presets import StylePresets
 from src.aoe_ir.backends.blender import BlenderBackend
 from src.aoe_ir.backends.headless_runner import BlenderHeadlessRunner
 
@@ -23,15 +24,11 @@ class TestLightingDynamic(unittest.TestCase):
     def test_toon_shader_reacts_to_light(self):
         # We test that the exact same asset rendered with light in 3 different positions
         # produces 3 different renders.
+        # Testing the advanced toon model with rim light reacting dynamically
+        app = StylePresets.create_cartoon()
         asset = AssetIR(
             asset_id="MonkeyToonLightTest",
-            appearance=AppearanceProfile(
-                appearance_id="toon_1",
-                family=AppearanceFamily.NPR,
-                style=StyleProfile(
-                    shading=ShadingProfile(model=ShaderModel.TOON, band_count=2, shadow_threshold=0.5)
-                )
-            )
+            appearance=app
         )
 
         with tempfile.TemporaryDirectory() as tmpdir:

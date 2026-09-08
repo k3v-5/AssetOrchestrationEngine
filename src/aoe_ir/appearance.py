@@ -39,16 +39,38 @@ class OutlineProfile:
     parameters: Dict[str, Any] = field(default_factory=dict)
 
 @dataclass
+class RimLightProfile:
+    enabled: bool = False
+    intensity: float = 1.0
+    color: str = "#FFFFFF"
+    softness: float = 0.1
+    width: float = 0.5
+
+@dataclass
+class SpecularProfile:
+    enabled: bool = False
+    intensity: float = 0.5
+    roughness: float = 0.1
+    color: str = "#FFFFFF"
+
+@dataclass
 class ShadingProfile:
     model: ShaderModel = ShaderModel.PBR
+
+    # Base lighting
     band_count: int = 1
     shadow_softness: float = 0.0
     shadow_threshold: float = 0.5
-    shadow_color: str = "#000000"
-    highlight_color: str = "#FFFFFF"
-    specular_intensity: float = 0.5
-    rim_light_enabled: bool = False
-    rim_light_intensity: float = 0.0
+
+    # Colors
+    shadow_color: str = "#33334c"
+    midtone_color: str = "#808099"
+    highlight_color: str = "#ffffff"
+
+    # Advanced Components
+    rim_light: RimLightProfile = field(default_factory=RimLightProfile)
+    specular: SpecularProfile = field(default_factory=SpecularProfile)
+
     parameters: Dict[str, Any] = field(default_factory=dict)
 
 @dataclass

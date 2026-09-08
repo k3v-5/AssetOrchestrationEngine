@@ -8,7 +8,13 @@ import logging
 
 logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
 
-def create_toon_basic_material(mat_name, shading_config):
+def hex_to_rgb(hex_color):
+    if not isinstance(hex_color, str) or not hex_color.startswith('#'):
+        return (1.0, 1.0, 1.0, 1.0)
+    hex_color = hex_color.lstrip('#')
+    return tuple(int(hex_color[i:i+2], 16) / 255.0 for i in (0, 2, 4)) + (1.0,)
+
+def create_toon_advanced_material(mat_name, shading_config):
     mat = bpy.data.materials.new(name=mat_name)
     mat.use_nodes = True
     nodes = mat.node_tree.nodes
@@ -18,45 +24,81 @@ def create_toon_basic_material(mat_name, shading_config):
     for node in nodes:
         nodes.remove(node)
 
-    # Setup TOON BASIC
+    # Base Shader Nodes
     output = nodes.new("ShaderNodeOutputMaterial")
-    bsdf = nodes.new("ShaderNodeBsdfPrincipled") # We use Principled to receive light
+    bsdf = nodes.new("ShaderNodeBsdfPrincipled") # For N.L base illumination in EEVEE
     shader_to_rgb = nodes.new("ShaderNodeShaderToRGB")
     color_ramp = nodes.new("ShaderNodeValToRGB")
 
-    color_ramp.color_ramp.interpolation = 'CONSTANT'
+    # Configuration
     band_count = shading_config.get("band_count", 2) if isinstance(shading_config, dict) else 2
+    softness = shading_config.get("shadow_softness", 0.0) if isinstance(shading_config, dict) else 0.0
+    threshold = shading_config.get("shadow_threshold", 0.5) if isinstance(shading_config, dict) else 0.5
+
+    shadow_col = hex_to_rgb(shading_config.get("shadow_color", "#33334c") if isinstance(shading_config, dict) else "#33334c")
+    mid_col = hex_to_rgb(shading_config.get("midtone_color", "#808099") if isinstance(shading_config, dict) else "#808099")
+    high_col = hex_to_rgb(shading_config.get("highlight_color", "#ffffff") if isinstance(shading_config, dict) else "#ffffff")
+
+    # Setup Interpolation based on softness
+    color_ramp.color_ramp.interpolation = 'B_SPLINE' if softness > 0.0 else 'CONSTANT'
 
     # Adjust bands
     while len(color_ramp.color_ramp.elements) < band_count:
         color_ramp.color_ramp.elements.new(0.5)
 
-    threshold = shading_config.get("shadow_threshold", 0.5) if isinstance(shading_config, dict) else 0.5
-
-    # Simple distribution of bands based on count
+    # Distribute bands
     color_ramp.color_ramp.elements[0].position = 0.0
-    color_ramp.color_ramp.elements[0].color = (0.1, 0.1, 0.2, 1.0) # Darkest Shadow
+    color_ramp.color_ramp.elements[0].color = shadow_col
 
     if band_count == 2:
         color_ramp.color_ramp.elements[1].position = threshold
-        color_ramp.color_ramp.elements[1].color = (0.8, 0.8, 0.9, 1.0) # Highlight
+        color_ramp.color_ramp.elements[1].color = high_col
     elif band_count == 3:
         color_ramp.color_ramp.elements[1].position = threshold * 0.7
-        color_ramp.color_ramp.elements[1].color = (0.4, 0.4, 0.5, 1.0) # Midtone
+        color_ramp.color_ramp.elements[1].color = mid_col
         color_ramp.color_ramp.elements[2].position = threshold * 1.3 if threshold * 1.3 <= 1.0 else 1.0
-        color_ramp.color_ramp.elements[2].color = (0.9, 0.9, 1.0, 1.0) # Highlight
+        color_ramp.color_ramp.elements[2].color = high_col
     elif band_count >= 4:
         color_ramp.color_ramp.elements[1].position = threshold * 0.5
-        color_ramp.color_ramp.elements[1].color = (0.3, 0.3, 0.4, 1.0) # Core shadow
+        color_ramp.color_ramp.elements[1].color = shadow_col
         color_ramp.color_ramp.elements[2].position = threshold
-        color_ramp.color_ramp.elements[2].color = (0.6, 0.6, 0.7, 1.0) # Midtone
+        color_ramp.color_ramp.elements[2].color = mid_col
         color_ramp.color_ramp.elements[3].position = threshold * 1.5 if threshold * 1.5 <= 1.0 else 1.0
-        color_ramp.color_ramp.elements[3].color = (0.95, 0.95, 1.0, 1.0) # Highlight
+        color_ramp.color_ramp.elements[3].color = high_col
 
-    # Links
+    last_color_node = color_ramp
+
+    # Rim Light Injection
+    rim_conf = shading_config.get("rim_light", {}) if isinstance(shading_config, dict) else {}
+    if isinstance(rim_conf, dict) and rim_conf.get("enabled", False):
+        # Rim light nodes (Fresnel logic approximated via Layer Weight)
+        layer_weight = nodes.new("ShaderNodeLayerWeight")
+        layer_weight.inputs["Blend"].default_value = 1.0 - rim_conf.get("width", 0.2)
+
+        rim_ramp = nodes.new("ShaderNodeValToRGB")
+        rim_ramp.color_ramp.interpolation = 'B_SPLINE' if rim_conf.get("softness", 0.0) > 0.0 else 'CONSTANT'
+        rim_ramp.color_ramp.elements[0].position = 0.9 # Hard edge
+        rim_ramp.color_ramp.elements[1].position = 1.0
+
+        mix_rgb = nodes.new("ShaderNodeMixRGB")
+        mix_rgb.blend_type = 'SCREEN'
+        mix_rgb.inputs["Fac"].default_value = rim_conf.get("intensity", 1.0)
+
+        rim_color = hex_to_rgb(rim_conf.get("color", "#ffffff"))
+
+        # Link Rim
+        links.new(layer_weight.outputs['Facing'], rim_ramp.inputs['Fac'])
+        # To avoid adding emission just mix the color to white/rim_color
+        # For simplicity, we just Screen it over the Toon ColorRamp
+        links.new(color_ramp.outputs['Color'], mix_rgb.inputs[1])
+        links.new(rim_ramp.outputs['Color'], mix_rgb.inputs[2])
+
+        last_color_node = mix_rgb
+
+    # Final Output link
     links.new(bsdf.outputs['BSDF'], shader_to_rgb.inputs['Shader'])
     links.new(shader_to_rgb.outputs['Color'], color_ramp.inputs['Fac'])
-    links.new(color_ramp.outputs['Color'], output.inputs['Surface'])
+    links.new(last_color_node.outputs['Color'], output.inputs['Surface'])
 
     return mat
 
@@ -132,7 +174,7 @@ def apply_semantic_materials(obj, appearance, regions):
 
                 mat_name = f"Mat_{obj.name}_{region_id}_Override"
                 shading_conf = style_override.get("shading", {}) if isinstance(style_override, dict) else {}
-                override_mat = create_toon_basic_material(mat_name, shading_conf)
+                override_mat = create_toon_advanced_material(mat_name, shading_conf)
 
                 obj.data.materials.append(override_mat)
                 mat_index = len(obj.data.materials) - 1
@@ -347,7 +389,7 @@ def main():
         # 2. Shading setup
         shading_conf = style.get("shading", {}) if isinstance(style, dict) else {}
         if "NPR" in str(family) or family == "NPR" or "AppearanceFamily.NPR" in str(family):
-            mat = create_toon_basic_material(f"Mat_{obj.name}_Toon", shading_conf)
+            mat = create_toon_advanced_material(f"Mat_{obj.name}_Toon", shading_conf)
             obj.data.materials.append(mat)
             logging.info(f"Material created (TOON_BASIC): {mat.name}")
         elif "PBR" in str(family) or family == "PBR" or "AppearanceFamily.PBR" in str(family):
@@ -367,55 +409,102 @@ def main():
             apply_semantic_materials(obj, appearance, semantic_regions)
 
 
-        # Test Rigging Injection for Deformation Outline tests
-        if "test_rig_pose" in asset.get("metadata", {}):
-            pose_angle = asset.get("metadata")["test_rig_pose"]
-            logging.info(f"Applying test armature deformation with angle {pose_angle}")
-
-            # Select the original object (it should be the active one right now or outline_obj)
-            bpy.context.view_layer.objects.active = obj
-
-            # Create a simple armature
-            bpy.ops.object.armature_add(location=(0, 0, 0))
-            armature = bpy.context.active_object
-
-            # Select mesh then armature and parent with automatic weights
-            obj.select_set(True)
-            armature.select_set(True)
-            bpy.context.view_layer.objects.active = armature
-            bpy.ops.object.parent_set(type='ARMATURE_AUTO')
-
-            # Also parent the outline if it exists
-            if outline_conf.get("enabled", False):
-                # Deselect all
+        # Reorder outline modifier if armature exists
+        if outline_conf.get("enabled", False) and armature:
+            if not obj.vertex_groups:
+                # Suzanne fallback needed auto weights for outline to stick
                 bpy.ops.object.select_all(action='DESELECT')
                 outline_obj.select_set(True)
                 armature.select_set(True)
                 bpy.context.view_layer.objects.active = armature
-                # Important: Outline should ideally share the same vertex groups
-                # Since we duplicated after subsurf but before armature in this script, it has no weights yet
-                # For this test, we'll bind it too
                 bpy.ops.object.parent_set(type='ARMATURE_AUTO')
 
-                # VERY IMPORTANT: Solidify must happen AFTER Armature modifier for outline to inflate deformed mesh correctly
-                # Reorder modifiers on outline
-                # 1. Armature
-                # 2. Outline_Solidify
-                bpy.ops.object.select_all(action='DESELECT')
-                outline_obj.select_set(True)
-                bpy.context.view_layer.objects.active = outline_obj
-                # The parent_set adds an Armature modifier at the end. We need to move it up.
+            else:
+                for vg in obj.vertex_groups:
+                    outline_obj.vertex_groups.new(name=vg.name)
+                mod = outline_obj.modifiers.new(name="Armature", type='ARMATURE')
+                mod.object = armature
+                outline_obj.parent = armature
+
+            bpy.ops.object.select_all(action='DESELECT')
+            outline_obj.select_set(True)
+            bpy.context.view_layer.objects.active = outline_obj
+            try:
                 bpy.ops.object.modifier_move_to_index(modifier="Armature", index=0)
+            except:
+                pass
 
+        # Parse Animation Foundation
+        anim = asset.get("animation", {})
+        if anim and armature:
+            active_pose_id = asset.get("metadata", {}).get("active_pose", "REST")
+            active_clip_id = anim.get("active_clip")
 
-            # Pose it
-
-            # Select armature to enter pose mode
+            # Enter pose mode
             bpy.ops.object.select_all(action='DESELECT')
             armature.select_set(True)
             bpy.context.view_layer.objects.active = armature
             bpy.ops.object.mode_set(mode='POSE')
 
+            # If we just need a static pose
+            if not active_clip_id:
+                logging.info(f"Applying static pose: {active_pose_id}")
+                pose_ir = None
+                if active_pose_id == "REST":
+                    pose_ir = anim.get("rest_pose")
+                else:
+                    clips = anim.get("clips", {})
+                    if active_pose_id in clips:
+                        pose_ir = clips[active_pose_id].get("keyframes", {}).get("0", {})
+
+                if pose_ir and pose_ir.get("bone_transforms"):
+                    for bone_id, transform in pose_ir.get("bone_transforms", {}).items():
+                        if bone_id in armature.pose.bones:
+                            pbone = armature.pose.bones[bone_id]
+                            pbone.rotation_mode = 'XYZ'
+                            pbone.rotation_euler = transform.get("rotation_euler", (0,0,0))
+
+            # If we need a continuous animation baked into an Action
+            else:
+                logging.info(f"Baking Animation Clip: {active_clip_id}")
+                clip = anim.get("clips", {}).get(active_clip_id)
+                if clip:
+                    # Create an action
+                    action = bpy.data.actions.new(name=f"Action_{active_clip_id}")
+                    if not armature.animation_data:
+                        armature.animation_data_create()
+                    armature.animation_data.action = action
+
+                    # Set scene timeline
+                    fps = clip.get("fps", 30)
+                    duration = clip.get("duration_frames", 30)
+                    bpy.context.scene.render.fps = fps
+                    bpy.context.scene.frame_start = 0
+                    bpy.context.scene.frame_end = duration
+
+                    keyframes = clip.get("keyframes", {})
+                    # For every defined frame in the clip, set the pose and insert keyframes
+                    for frame_str, pose_ir in keyframes.items():
+                        frame_idx = int(frame_str)
+                        bpy.context.scene.frame_set(frame_idx)
+
+                        if pose_ir and pose_ir.get("bone_transforms"):
+                            for bone_id, transform in pose_ir.get("bone_transforms", {}).items():
+                                if bone_id in armature.pose.bones:
+                                    pbone = armature.pose.bones[bone_id]
+                                    pbone.rotation_mode = 'XYZ'
+                                    pbone.rotation_euler = transform.get("rotation_euler", (0,0,0))
+                                    pbone.keyframe_insert(data_path="rotation_euler", frame=frame_idx)
+
+            bpy.ops.object.mode_set(mode='OBJECT')
+
+        # Support fallback for legacy deformation test
+        if "test_rig_pose" in asset.get("metadata", {}):
+            pose_angle = asset.get("metadata")["test_rig_pose"]
+            bpy.ops.object.select_all(action='DESELECT')
+            armature.select_set(True)
+            bpy.context.view_layer.objects.active = armature
+            bpy.ops.object.mode_set(mode='POSE')
             pbone = armature.pose.bones[0]
             pbone.rotation_mode = 'XYZ'
             pbone.rotation_euler = (pose_angle, 0, 0)
@@ -437,8 +526,34 @@ def main():
             bpy.ops.object.light_add(type='SUN', location=light_loc, rotation=(0.5, 0.5, 0))
 
             bpy.context.scene.render.engine = 'BLENDER_EEVEE_NEXT' if hasattr(bpy.types.SceneEEVEE, 'TAA_samples') else 'BLENDER_EEVEE'
-            bpy.context.scene.render.filepath = render_path
-            bpy.ops.render.render(write_still=True)
+
+            # Check if sequence rendering is requested
+            anim = asset.get("animation", {})
+            if anim and anim.get("active_clip"):
+                logging.info(f"Rendering Sequence from {bpy.context.scene.frame_start} to {bpy.context.scene.frame_end}")
+                # Ensure the path contains a directory since we will render multiple files
+                base_dir = os.path.dirname(render_path)
+                filename = os.path.basename(render_path)
+                name, ext = os.path.splitext(filename)
+
+                # Blender auto-appends frame numbers if path has no hash, so we use '#' chars
+                seq_path = os.path.join(base_dir, name + "_####" + ext)
+                bpy.context.scene.render.filepath = seq_path
+                bpy.ops.render.render(animation=True, write_still=True)
+
+                # Copy frame 0 or start frame to the requested render_path so simple checks don't fail
+                try:
+                    import shutil
+                    start_str = str(bpy.context.scene.frame_start).zfill(4)
+                    rendered_first = os.path.join(base_dir, f"{name}_{start_str}{ext}")
+                    if os.path.exists(rendered_first):
+                        shutil.copy(rendered_first, render_path)
+                except Exception as e:
+                    logging.error(f"Failed to copy first frame to requested path: {e}")
+            else:
+                bpy.context.scene.render.filepath = render_path
+                bpy.ops.render.render(write_still=True)
+
             logging.info("Render completed")
 
         # Save .blend
@@ -453,7 +568,8 @@ def main():
             "scene_report": report
         }
 
-        print(f"AOE_RESULT:{json.dumps(result_data)}")
+        sys.stdout.write(f"AOE_RESULT:{json.dumps(result_data)}\n")
+        sys.stdout.flush()
     except Exception as e:
         import traceback
         result_data = {
@@ -461,7 +577,8 @@ def main():
             "error": str(e),
             "traceback": traceback.format_exc()
         }
-        print(f"AOE_RESULT:{json.dumps(result_data)}")
+        sys.stdout.write(f"AOE_RESULT:{json.dumps(result_data)}\n")
+        sys.stdout.flush()
 
 if __name__ == "__main__":
     main()
