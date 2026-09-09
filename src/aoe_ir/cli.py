@@ -7,10 +7,7 @@ from .style_presets import StyleProfile
 from .character import CharacterIR
 from .orchestrator import AssetOrchestrator, ProductionBatchIR, CharacterRecipe
 from .backends.unreal import UnrealBackend
-# Dummy blender backend import conceptually
-class DummyBlenderBackend:
-    def execute(self, char):
-        return {"status": "SUCCESS"}
+from .backends.blender import BlenderBackend
 
 def main():
     parser = argparse.ArgumentParser(description="Asset Orchestration Engine (AOE) CLI")
@@ -47,7 +44,7 @@ def main():
         batch = ProductionBatchIR(batch_id=batch_data.get("batch_id", "batch"), recipes=recipes, output_directory=args.output)
 
         print(f"Executing Pipeline for {len(recipes)} characters...")
-        blender = DummyBlenderBackend()
+        blender = BlenderBackend()
         unreal = UnrealBackend()
         orchestrator = AssetOrchestrator(blender_backend=blender, unreal_backend=unreal)
 

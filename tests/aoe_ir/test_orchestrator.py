@@ -8,7 +8,7 @@ from src.aoe_ir.backends.unreal import UnrealBackend
 
 # Mock backend for Blender so we don't need real headless execution in this unit test
 class MockBlenderBackend:
-    def execute(self, char):
+    def export_asset(self, char):
         return {"status": "SUCCESS"}
 
 class TestAssetOrchestrator(unittest.TestCase):

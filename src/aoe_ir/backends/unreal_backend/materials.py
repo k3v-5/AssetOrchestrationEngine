@@ -1,4 +1,5 @@
 from ...appearance import AppearanceProfile, AppearanceFamily
+from .manifest import ManifestMaterialInstanceInfo
 
 class UnrealMaterialTranslator:
     @staticmethod
@@ -10,28 +11,44 @@ class UnrealMaterialTranslator:
         return "/Game/AOE/Materials/M_AOE_Default"
 
     @staticmethod
-    def generate_instance_parameters(app: AppearanceProfile) -> dict:
-        params = {}
+    def hex_to_rgba(hex_str: str) -> list[float]:
+        hex_str = hex_str.lstrip('#')
+        if len(hex_str) == 6:
+            r, g, b = tuple(int(hex_str[i:i+2], 16) / 255.0 for i in (0, 2, 4))
+            return [r, g, b, 1.0]
+        return [1.0, 1.0, 1.0, 1.0]
+
+    @staticmethod
+    def generate_instance_parameters(app: AppearanceProfile, char_id: str) -> ManifestMaterialInstanceInfo:
+        instance_info = ManifestMaterialInstanceInfo(
+            name=f"MI_{char_id}",
+            parent=UnrealMaterialTranslator.resolve_master_material(app)
+        )
+
         if app.family == AppearanceFamily.NPR:
             shading = app.style.shading
             layers = app.style.npr_profile.layers if app.style.npr_profile else None
 
-            params["VectorParameterValues"] = {
-                "ShadowColor": shading.shadow_color,
-                "MidtoneColor": shading.midtone_color,
-                "HighlightColor": shading.highlight_color,
+            instance_info.vector_parameters = {
+                "ShadowColor": UnrealMaterialTranslator.hex_to_rgba(shading.shadow_color),
+                "MidtoneColor": UnrealMaterialTranslator.hex_to_rgba(shading.midtone_color),
+                "HighlightColor": UnrealMaterialTranslator.hex_to_rgba(shading.highlight_color),
             }
-            params["ScalarParameterValues"] = {
-                "BandCount": shading.band_count,
+
+            instance_info.scalar_parameters = {
+                "BandCount": float(shading.band_count),
                 "ShadowThreshold": shading.shadow_threshold,
                 "ShadowSoftness": shading.shadow_softness,
             }
+
             if shading.rim_light.enabled:
-                params["ScalarParameterValues"]["RimIntensity"] = shading.rim_light.intensity
-                params["VectorParameterValues"]["RimColor"] = shading.rim_light.color
+                instance_info.scalar_parameters["RimIntensity"] = shading.rim_light.intensity
+                instance_info.vector_parameters["RimColor"] = UnrealMaterialTranslator.hex_to_rgba(shading.rim_light.color)
+
             if layers:
                 if layers.curvature.enabled:
-                    params["ScalarParameterValues"]["CurvatureIntensity"] = layers.curvature.intensity
+                    instance_info.scalar_parameters["CurvatureIntensity"] = layers.curvature.intensity
                 if layers.grunge.enabled:
-                    params["ScalarParameterValues"]["GrungeIntensity"] = layers.grunge.intensity
-        return params
+                    instance_info.scalar_parameters["GrungeIntensity"] = layers.grunge.intensity
+
+        return instance_info

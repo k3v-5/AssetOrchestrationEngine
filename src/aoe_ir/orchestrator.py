@@ -47,7 +47,7 @@ class AssetOrchestrator:
                 char.ik_config = recipe.ik_config
 
             # 1. Pipeline Execution in Blender (Procedural Gen / Animation Bake)
-            blender_result = self.blender_backend.execute(char)
+            blender_result = self.blender_backend.export_asset(char)
 
             # 2. Pipeline Export to Unreal (Manifests / Zero-Click Script)
             char_output_dir = os.path.join(batch.output_dir, recipe.recipe_id)

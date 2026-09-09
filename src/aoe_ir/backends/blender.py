@@ -68,7 +68,7 @@ class BlenderBackend(RenderBackend):
         result = {
             "status": "SUCCESS (SIMULATED)",
             "backend": self.get_backend_name(),
-            "asset_id": asset.asset_id,
+            "asset_id": getattr(asset, 'asset_id', getattr(asset, 'character_id', 'Unknown')),
             "generated_nodes": self._generate_shader_graph(asset)
         }
         return result
