@@ -27,3 +27,16 @@ class AnimationFoundationIR:
     clips: Dict[str, AnimationClipIR] = field(default_factory=dict)
     active_pose: Optional[str] = None # For static rendering, a selected pose from clips
     active_clip: Optional[str] = None # For sequence rendering
+
+@dataclass
+class AnimationLayerIR:
+    layer_id: str
+    clip_id: str
+    weight: float = 1.0
+    blend_mode: str = "ADDITIVE" # or OVERRIDE
+
+@dataclass
+class AnimationGraphIR:
+    graph_id: str
+    base_clip_id: str
+    layers: List[AnimationLayerIR] = field(default_factory=list)

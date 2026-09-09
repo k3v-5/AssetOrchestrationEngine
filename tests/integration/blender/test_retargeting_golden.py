@@ -6,6 +6,7 @@ import shutil
 from src.aoe_ir.character import CharacterIR
 from src.aoe_ir.appearance import AppearanceProfile, AppearanceFamily, StyleProfile, ShadingProfile, ShaderModel, OutlineProfile, OutlineMethod, StyleProfileType
 from src.aoe_ir.animation import AnimationFoundationIR, InterpolationType
+from src.aoe_ir.ik import IKSolverConfigIR, IKConstraintIR, IKConstraintType
 from src.aoe_ir.pose import PoseIR
 from src.aoe_ir.interchange.animation import ExternalAnimation, ExternalKeyframe, ExternalBoneTransform
 from src.aoe_ir.interchange.mapper import SkeletonMapper
@@ -80,6 +81,27 @@ class TestRetargetingGolden(unittest.TestCase):
                 # Override the base test animation with the retargeted one
                 char.animation.clips["walk"] = aoe_clip
                 char.animation.active_clip = "walk"
+
+                # Apply an IK constraint to the feet pointing to the floor
+                char.ik_config = IKSolverConfigIR(
+                    solver_id="legs",
+                    constraints=[
+                        IKConstraintIR(
+                            constraint_id="foot_l_plant",
+                            bone_target="foot_L",
+                            constraint_type=IKConstraintType.POSITION,
+                            chain_length=2,
+                            target_position=(0.1, 0, 0)
+                        ),
+                        IKConstraintIR(
+                            constraint_id="foot_r_plant",
+                            bone_target="foot_R",
+                            constraint_type=IKConstraintType.POSITION,
+                            chain_length=2,
+                            target_position=(-0.1, 0, 0)
+                        )
+                    ]
+                )
 
                 render_base_path = os.path.join(tmpdir, f"retarget_{style_name.lower()}.png")
 

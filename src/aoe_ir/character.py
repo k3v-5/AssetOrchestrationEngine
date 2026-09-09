@@ -4,6 +4,7 @@ from enum import Enum
 from .appearance import AppearanceProfile
 from .skeleton import SkeletonIR, SkinningIR
 from .animation import AnimationFoundationIR
+from .ik import IKSolverConfigIR
 
 class SemanticRegionTag(str, Enum):
     # Head Hierarchy
@@ -45,4 +46,5 @@ class CharacterIR:
     semantic_regions: List[CharacterSemanticRegionIR] = field(default_factory=list)
     appearance: Optional[AppearanceProfile] = None
     animation: Optional[AnimationFoundationIR] = None
+    ik_config: Optional[IKSolverConfigIR] = None
     metadata: Dict[str, str] = field(default_factory=dict)

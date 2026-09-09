@@ -1,4 +1,9 @@
-from dataclasses import dataclass, field
+with open("src/aoe_ir/pose.py", "r") as f:
+    code = f.read()
+
+# Adding TransformIR explicitly to represent global and local transformation intention independently.
+# It makes future IK and constraints easier because they won't necessarily live inside a PoseIR dictionary
+new_code = """from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple
 
 @dataclass
@@ -16,3 +21,6 @@ class PoseTransformIR(TransformIR):
 class PoseIR:
     pose_id: str
     bone_transforms: Dict[str, PoseTransformIR] = field(default_factory=dict)
+"""
+with open("src/aoe_ir/pose.py", "w") as f:
+    f.write(new_code)
