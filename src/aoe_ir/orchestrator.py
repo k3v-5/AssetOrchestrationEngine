@@ -51,7 +51,8 @@ class AssetOrchestrator:
 
             # 2. Pipeline Export to Unreal (Manifests / Zero-Click Script)
             char_output_dir = os.path.join(batch.output_dir, recipe.recipe_id)
-            unreal_result = self.unreal_backend.export_asset(char, output_dir=char_output_dir)
+            fbx_path = blender_result.get("exported_fbx", "")
+            unreal_result = self.unreal_backend.export_asset(char, output_dir=char_output_dir, fbx_path=fbx_path)
 
             results[recipe.recipe_id] = {
                 "blender_status": blender_result["status"],

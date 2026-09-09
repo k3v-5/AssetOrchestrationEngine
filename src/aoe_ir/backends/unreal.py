@@ -26,7 +26,8 @@ class UnrealBackend(RenderBackend):
     def export_asset(self, asset: AssetIR, **kwargs) -> Dict[str, Any]:
         self.check_capabilities(asset)
         output_dir = kwargs.get("output_dir", "unreal_export")
-        manifest_path = UnrealExporter(output_dir).export(asset)
+        fbx_path = kwargs.get("fbx_path", "")
+        manifest_path = UnrealExporter(output_dir).export(asset, fbx_path)
 
         result = {
             "status": "SUCCESS",

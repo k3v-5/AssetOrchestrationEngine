@@ -64,12 +64,27 @@ class BlenderBackend(RenderBackend):
             except RuntimeError as e:
                 return {"status": "FAILED", "error": str(e)}
 
+        # SIMULATED FBX EXPORT LOGIC FOR HEADLESS BLENDER
+        # In a real execution, this would be inside the executor.py running in bpy context.
+        # Required for UE5:
+        # bpy.ops.export_scene.fbx(
+        #     filepath=kwargs.get("fbx_path", "output.fbx"),
+        #     axis_forward='-Y',
+        #     axis_up='Z',
+        #     bake_space_transform=True,
+        #     use_mesh_modifiers=True, # Critical for Inverted Hull NPR
+        #     mesh_smooth_type='FACE',
+        #     object_types={'ARMATURE', 'MESH'},
+        #     add_leaf_bones=False
+        # )
+
         # Fallback to simulated plan if real execution is not requested
         result = {
             "status": "SUCCESS (SIMULATED)",
             "backend": self.get_backend_name(),
             "asset_id": getattr(asset, 'asset_id', getattr(asset, 'character_id', 'Unknown')),
-            "generated_nodes": self._generate_shader_graph(asset)
+            "generated_nodes": self._generate_shader_graph(asset),
+            "exported_fbx": kwargs.get("fbx_path", f"{getattr(asset, 'asset_id', getattr(asset, 'character_id', 'Unknown'))}.fbx")
         }
         return result
 
