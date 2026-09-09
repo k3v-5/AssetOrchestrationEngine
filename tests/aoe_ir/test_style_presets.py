@@ -16,8 +16,8 @@ class TestStylePresets(unittest.TestCase):
         app = StylePresets.create_comic()
         self.assertEqual(app.style.style_type, StyleProfileType.COMIC)
         self.assertEqual(app.style.shading.band_count, 4)
-        self.assertTrue(app.style.texture.use_hatching)
-        self.assertTrue(app.style.texture.use_curvature)
+        self.assertTrue(app.style.npr_profile.layers.grunge.enabled)
+        self.assertTrue(app.style.npr_profile.layers.curvature.enabled)
 
     def test_cartoon_preset(self):
         app = StylePresets.create_cartoon()

@@ -14,7 +14,7 @@ def hex_to_rgb(hex_color):
     hex_color = hex_color.lstrip('#')
     return tuple(int(hex_color[i:i+2], 16) / 255.0 for i in (0, 2, 4)) + (1.0,)
 
-def create_toon_advanced_material(mat_name, shading_config):
+def create_toon_advanced_material(mat_name, shading_config, style_layers=None):
     mat = bpy.data.materials.new(name=mat_name)
     mat.use_nodes = True
     nodes = mat.node_tree.nodes
@@ -95,6 +95,67 @@ def create_toon_advanced_material(mat_name, shading_config):
 
         last_color_node = mix_rgb
 
+    if not style_layers: style_layers = {}
+    if isinstance(style_layers, dict) and "layers" in style_layers:
+        style_layers = style_layers.get("layers", {})
+
+    # Curvature Injection
+    curv_conf = style_layers.get("curvature", {}) if isinstance(style_layers, dict) else {}
+    if isinstance(curv_conf, dict) and curv_conf.get("enabled", False):
+        geom_node = nodes.new("ShaderNodeNewGeometry")
+        curv_color = nodes.new("ShaderNodeMixRGB")
+        curv_color.blend_type = curv_conf.get("blend_mode", "MULTIPLY")
+        curv_color.inputs["Fac"].default_value = curv_conf.get("intensity", 1.0)
+
+        # Approximate curvature via Pointiness
+        point_ramp = nodes.new("ShaderNodeValToRGB")
+        point_ramp.color_ramp.elements[0].position = 0.4
+        point_ramp.color_ramp.elements[0].color = hex_to_rgb(curv_conf.get("cavity_color", "#111111"))
+        point_ramp.color_ramp.elements[1].position = 0.6
+        point_ramp.color_ramp.elements[1].color = (1.0, 1.0, 1.0, 1.0)
+
+        links.new(geom_node.outputs["Pointiness"], point_ramp.inputs["Fac"])
+        links.new(last_color_node.outputs["Color"], curv_color.inputs[1])
+        links.new(point_ramp.outputs["Color"], curv_color.inputs[2])
+        last_color_node = curv_color
+
+    # Fetch temporal behavior
+    temp_conf = style_layers.get("temporal", {}) if isinstance(style_layers, dict) else {}
+    use_temporal = isinstance(temp_conf, dict) and temp_conf.get("enabled", False)
+    update_rate = temp_conf.get("update_rate", 2) if use_temporal else 1
+
+    # Grunge Injection
+    grunge_conf = style_layers.get("grunge", {}) if isinstance(style_layers, dict) else {}
+    if isinstance(grunge_conf, dict) and grunge_conf.get("enabled", False):
+        noise = nodes.new("ShaderNodeTexNoise")
+        noise.noise_dimensions = '4D'
+        noise.inputs["Scale"].default_value = grunge_conf.get("scale", 10.0)
+
+        # Temporal State Hook (Changing the W seed)
+        if use_temporal:
+            # We use a math node sequence to step the W value over time
+            frame_info = nodes.new("ShaderNodeValue")
+            frame_info.name = "Time_Frame"
+            # Add driver to value node
+            d = frame_info.outputs[0].driver_add("default_value").driver
+            # Create stepped evaluation expression (e.g., floor(frame / 3) * offset)
+            d.expression = f"floor(frame / {update_rate}) * 0.5"
+            links.new(frame_info.outputs[0], noise.inputs["W"])
+
+        grunge_mix = nodes.new("ShaderNodeMixRGB")
+        grunge_mix.blend_type = grunge_conf.get("blend_mode", "MULTIPLY")
+        grunge_mix.inputs["Fac"].default_value = grunge_conf.get("intensity", 1.0)
+
+        # Color mapping
+        grunge_ramp = nodes.new("ShaderNodeValToRGB")
+        grunge_ramp.color_ramp.elements[0].color = hex_to_rgb(grunge_conf.get("color", "#222222"))
+        grunge_ramp.color_ramp.elements[1].color = (1.0, 1.0, 1.0, 1.0)
+
+        links.new(noise.outputs["Fac"], grunge_ramp.inputs["Fac"])
+        links.new(last_color_node.outputs["Color"], grunge_mix.inputs[1])
+        links.new(grunge_ramp.outputs["Color"], grunge_mix.inputs[2])
+        last_color_node = grunge_mix
+
     # Final Output link
     links.new(bsdf.outputs['BSDF'], shader_to_rgb.inputs['Shader'])
     links.new(shader_to_rgb.outputs['Color'], color_ramp.inputs['Fac'])
@@ -174,7 +235,7 @@ def apply_semantic_materials(obj, appearance, regions):
 
                 mat_name = f"Mat_{obj.name}_{region_id}_Override"
                 shading_conf = style_override.get("shading", {}) if isinstance(style_override, dict) else {}
-                override_mat = create_toon_advanced_material(mat_name, shading_conf)
+                override_mat = create_toon_advanced_material(mat_name, shading_conf, style_override.get("npr_profile", {}) if style_override.get("npr_profile") else {})
 
                 obj.data.materials.append(override_mat)
                 mat_index = len(obj.data.materials) - 1
@@ -216,9 +277,12 @@ def extract_scene_report():
         "node_groups": [ng.name for ng in bpy.data.node_groups]
     }
 
+    report["shape_keys"] = {}
     for obj in bpy.data.objects:
         if obj.modifiers:
             report["modifiers"][obj.name] = [mod.name for mod in obj.modifiers]
+        if obj.type == 'MESH' and obj.data.shape_keys:
+            report["shape_keys"][obj.name] = [sk.name for sk in obj.data.shape_keys.key_blocks]
 
     return report
 
@@ -378,18 +442,29 @@ def main():
         obj_name = asset.get("asset_id", asset.get("character_id", "AOE_Asset"))
         obj, armature = construct_humanoid_mesh_and_rig(asset, obj_name)
 
-        # Apply Subdivision Surface for smoothness
+        # Apply Subdivision Surface for smoothness BEFORE shape keys
         subsurf = obj.modifiers.new(name="Subsurf", type='SUBSURF')
         subsurf.levels = 2
         subsurf.render_levels = 2
         bpy.ops.object.modifier_apply(modifier="Subsurf")
+
+        # Check if a FaceRig is declared, if so, construct matching dummy shape keys on the mesh
+        face_rig = asset.get("face_rig", {})
+        if face_rig:
+            # Create Basis shape key
+            if not obj.data.shape_keys:
+                obj.shape_key_add(name="Basis", from_mix=False)
+
+            for shape_name, shape_data in face_rig.get("blend_shapes", {}).items():
+                if shape_name not in obj.data.shape_keys.key_blocks:
+                    sk = obj.shape_key_add(name=shape_name, from_mix=False)
 
         logging.info(f"Scene created with base geometry: {obj.name}")
 
         # 2. Shading setup
         shading_conf = style.get("shading", {}) if isinstance(style, dict) else {}
         if "NPR" in str(family) or family == "NPR" or "AppearanceFamily.NPR" in str(family):
-            mat = create_toon_advanced_material(f"Mat_{obj.name}_Toon", shading_conf)
+            mat = create_toon_advanced_material(f"Mat_{obj.name}_Toon", shading_conf, style.get("npr_profile", {}) if style.get("npr_profile") else {})
             obj.data.materials.append(mat)
             logging.info(f"Material created (TOON_BASIC): {mat.name}")
         elif "PBR" in str(family) or family == "PBR" or "AppearanceFamily.PBR" in str(family):
@@ -479,6 +554,58 @@ def main():
                             logging.info(f"Assigned IK Constraint for {bone_target} with target {target_obj.name}")
             bpy.ops.object.mode_set(mode='OBJECT')
 
+            # Handle Facial Animation Tracking
+            anim_graph = asset.get("metadata", {}).get("animation_graph", asset.get("animation_graph", {}))
+            face_rig = asset.get("face_rig", {})
+            active_face_track_id = anim_graph.get("active_facial_track") if anim_graph else None
+
+            if active_face_track_id and face_rig:
+                logging.info(f"Baking Facial Expressions Track: {active_face_track_id}")
+                face_track = anim_graph.get("facial_tracks", {}).get(active_face_track_id)
+                expressions = face_rig.get("expressions", {})
+
+                if face_track:
+                    # In Blender, shape keys belong to the Mesh (Object), not the Armature
+                    # Get the body mesh
+                    body_mesh = obj # Assumes single mesh or active object for simplified test
+
+                    if body_mesh and body_mesh.data.shape_keys:
+                        # We need to bake the keyframes onto the shape keys
+                        action_name = f"FaceAction_{active_face_track_id}"
+                        if not body_mesh.data.shape_keys.animation_data:
+                            body_mesh.data.shape_keys.animation_data_create()
+
+                        face_action = bpy.data.actions.new(name=action_name)
+                        body_mesh.data.shape_keys.animation_data.action = face_action
+
+                        keyframes = face_track.get("keyframes", {})
+                        for frame_str, expr_weights in keyframes.items():
+                            frame_idx = int(frame_str)
+
+                            # Reset all shapes to 0 for this frame to avoid cumulative overlaps
+                            # (unless the expression explicitly drives them)
+                            for kb in body_mesh.data.shape_keys.key_blocks:
+                                if kb.name != "Basis":
+                                    kb.value = 0.0
+
+                            # An expression can be composed of multiple morphs or bones.
+                            for expr_id, global_weight in expr_weights.items():
+                                expr_profile = expressions.get(expr_id)
+                                if expr_profile:
+                                    for comp in expr_profile.get("components", []):
+                                        if comp.get("channel_type") in ["BLENDSHAPE", "FacialChannelType.BLENDSHAPE"]:
+                                            shape_name = comp.get("channel_id")
+                                            local_weight = comp.get("weight", 1.0)
+
+                                            kb = body_mesh.data.shape_keys.key_blocks.get(shape_name)
+                                            if kb:
+                                                # Additive blend
+                                                kb.value += (local_weight * global_weight)
+                                                kb.keyframe_insert(data_path="value", frame=frame_idx)
+
+                                        # (Handling bones from facial expressions would go here,
+                                        # mapping back to armature pose bones)
+
             # If we just need a static pose
             if not active_clip_id:
                 logging.info(f"Applying static pose: {active_pose_id}")
@@ -556,6 +683,11 @@ def main():
         render_path = args.get("render_path")
         if render_path:
             logging.info("Render started")
+
+            # Reset Context just in case
+            bpy.ops.object.mode_set(mode='OBJECT')
+            bpy.ops.object.select_all(action='DESELECT')
+
             # Basic camera and light
             bpy.ops.object.camera_add(location=(0, -6, 1), rotation=(1.2, 0, 0))
             cam = bpy.context.active_object

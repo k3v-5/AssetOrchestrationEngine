@@ -5,6 +5,8 @@ from .appearance import AppearanceProfile
 from .skeleton import SkeletonIR, SkinningIR
 from .animation import AnimationFoundationIR
 from .ik import IKSolverConfigIR
+from .facial import FaceRigIR
+from .physics import PhysicsRigIR
 
 class SemanticRegionTag(str, Enum):
     # Head Hierarchy
@@ -47,4 +49,6 @@ class CharacterIR:
     appearance: Optional[AppearanceProfile] = None
     animation: Optional[AnimationFoundationIR] = None
     ik_config: Optional[IKSolverConfigIR] = None
+    face_rig: Optional[FaceRigIR] = None
+    physics_rig: Optional[PhysicsRigIR] = None
     metadata: Dict[str, str] = field(default_factory=dict)

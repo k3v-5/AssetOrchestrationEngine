@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 from enum import Enum
 from .pose import PoseIR
+from .facial import ExpressionTrackIR, LipSyncTrackIR
 
 class InterpolationType(str, Enum):
     LINEAR = "LINEAR"
@@ -40,3 +41,10 @@ class AnimationGraphIR:
     graph_id: str
     base_clip_id: str
     layers: List[AnimationLayerIR] = field(default_factory=list)
+
+    # Facial and speech tracks run in parallel to skeletal clips
+    facial_tracks: Dict[str, ExpressionTrackIR] = field(default_factory=dict)
+    lipsync_tracks: Dict[str, LipSyncTrackIR] = field(default_factory=dict)
+
+    active_facial_track: Optional[str] = None
+    active_lipsync_track: Optional[str] = None

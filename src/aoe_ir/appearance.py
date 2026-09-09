@@ -83,11 +83,67 @@ class TextureProfile:
     parameters: Dict[str, Any] = field(default_factory=dict)
 
 @dataclass
+class CurvatureLayerIR:
+    enabled: bool = False
+    intensity: float = 1.0
+    edge_color: str = "#000000"
+    cavity_color: str = "#111111"
+    blend_mode: str = "MULTIPLY"
+
+@dataclass
+class GrungeLayerIR:
+    enabled: bool = False
+    intensity: float = 1.0
+    scale: float = 10.0
+    color: str = "#222222"
+    blend_mode: str = "MULTIPLY"
+    # Determines if grunge is driven by AO, cavity, or flat procedural noise
+    driver: str = "CAVITY"
+
+@dataclass
+class HatchingLayerIR:
+    enabled: bool = False
+    intensity: float = 1.0
+    scale: float = 5.0
+    color: str = "#000000"
+    rotation_angle: float = 45.0
+    # Object, Screen, World, or Tangent
+    coordinate_space: str = "SCREEN"
+    blend_mode: str = "MULTIPLY"
+
+@dataclass
+class TemporalBehaviorIR:
+    enabled: bool = False
+    update_rate: int = 2 # Change noise every N frames
+    hold_frames: int = 1 # How long a generated texture holds before flipping
+    transition_mode: str = "SNAP" # SNAP or BLEND
+    seed_offset: int = 0
+
+@dataclass
+class StyleLayerIR:
+    curvature: CurvatureLayerIR = field(default_factory=CurvatureLayerIR)
+    grunge: GrungeLayerIR = field(default_factory=GrungeLayerIR)
+    hatching: HatchingLayerIR = field(default_factory=HatchingLayerIR)
+    temporal: TemporalBehaviorIR = field(default_factory=TemporalBehaviorIR)
+
+@dataclass
+class NPRProfileIR:
+    shading: ShadingProfile = field(default_factory=ShadingProfile)
+    outline: OutlineProfile = field(default_factory=OutlineProfile)
+    layers: StyleLayerIR = field(default_factory=StyleLayerIR)
+
+@dataclass
 class StyleProfile:
     style_type: StyleProfileType = StyleProfileType.REALISTIC
+
+    # Base configuration backwards compatible
     shading: ShadingProfile = field(default_factory=ShadingProfile)
     outline: OutlineProfile = field(default_factory=OutlineProfile)
     texture: TextureProfile = field(default_factory=TextureProfile)
+
+    # Advanced composition
+    npr_profile: Optional[NPRProfileIR] = None
+
     parameters: Dict[str, Any] = field(default_factory=dict)
 
 @dataclass

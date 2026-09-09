@@ -79,7 +79,7 @@ class TestCharacterMultipose(unittest.TestCase):
 
                     res = self.backend.export_asset(char_ir, filepath=blend_path, render_path=render_path)
 
-                    self.assertEqual(res["status"], "SUCCESS")
+                    self.assertEqual(res["status"], "SUCCESS", msg=res.get("error", res.get("traceback", "")))
                     self.assertTrue(os.path.exists(render_path))
 
                     # Copy to artifacts

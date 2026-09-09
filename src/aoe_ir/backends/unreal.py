@@ -3,6 +3,8 @@ from ..asset import AssetIR
 from ..scene import SceneIR
 from typing import Dict, Any
 from ..appearance import AppearanceFamily, ShaderModel
+import os
+from .unreal_backend.unreal_exporter import UnrealExporter
 
 class UnrealBackend(RenderBackend):
     def get_backend_name(self) -> str:
@@ -12,7 +14,7 @@ class UnrealBackend(RenderBackend):
         return BackendCapabilities(
             pbr=True,
             toon=True,
-            inverted_hull=False, # Unreal usually does post-process outline
+            inverted_hull=False,
             semantic_overrides=True,
             stencil=True,
             post_process_outline=True,
@@ -23,12 +25,14 @@ class UnrealBackend(RenderBackend):
 
     def export_asset(self, asset: AssetIR, **kwargs) -> Dict[str, Any]:
         self.check_capabilities(asset)
-        """Translates the AssetIR to a .uasset / Material Instance representation."""
+        output_dir = kwargs.get("output_dir", "unreal_export")
+        manifest_path = UnrealExporter(output_dir).export(asset)
+
         result = {
             "status": "SUCCESS",
             "backend": self.get_backend_name(),
-            "asset_id": asset.asset_id,
-            "master_material": self._resolve_master_material(asset)
+            "asset_id": getattr(asset, "character_id", getattr(asset, "asset_id", "Unknown")),
+            "manifest_path": manifest_path
         }
         return result
 
@@ -36,9 +40,7 @@ class UnrealBackend(RenderBackend):
         return {"status": "SUCCESS", "scene_id": scene.scene_id}
 
     def _resolve_master_material(self, asset: AssetIR) -> str:
-        """Resolves the correct Unreal Master Material based on the AppearanceProfile."""
         app = asset.appearance
-
         if app.family == AppearanceFamily.PBR:
             return "/Engine/MasterMaterials/M_PBR_Master"
         elif app.family == AppearanceFamily.NPR:
@@ -46,5 +48,4 @@ class UnrealBackend(RenderBackend):
                 return "/Engine/MasterMaterials/M_NPR_Anime_Master"
             elif app.style.shading.model == ShaderModel.UNLIT:
                 return "/Engine/MasterMaterials/M_Unlit_Master"
-
         return "/Engine/MasterMaterials/M_Default"

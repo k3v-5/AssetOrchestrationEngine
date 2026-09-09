@@ -1,7 +1,7 @@
 from .appearance import (
     AppearanceProfile, AppearanceFamily, StyleProfile, StyleProfileType,
     ShadingProfile, ShaderModel, OutlineProfile, OutlineMethod, TextureProfile,
-    RimLightProfile, SpecularProfile
+    RimLightProfile, SpecularProfile, NPRProfileIR, StyleLayerIR, CurvatureLayerIR, GrungeLayerIR, HatchingLayerIR, TemporalBehaviorIR
 )
 
 class StylePresets:
@@ -71,11 +71,68 @@ class StylePresets:
                     width=0.035, # Thicker for comic books
                     color="#000000"
                 ),
-                texture=TextureProfile(
-                    mode="PAINTED",
-                    use_curvature=True,
-                    use_grunge=True,
-                    use_hatching=True
+                npr_profile=NPRProfileIR(
+                    layers=StyleLayerIR(
+                        curvature=CurvatureLayerIR(enabled=True, intensity=1.2, cavity_color="#111122"),
+                        grunge=GrungeLayerIR(enabled=True, intensity=0.6, scale=15.0)
+                    )
+                )
+            )
+        )
+
+    @staticmethod
+    def create_borderlands(appearance_id: str = "borderlands_base") -> AppearanceProfile:
+        return AppearanceProfile(
+            appearance_id=appearance_id,
+            family=AppearanceFamily.NPR,
+            style=StyleProfile(
+                style_type=StyleProfileType.STYLIZED,
+                shading=ShadingProfile(
+                    model=ShaderModel.TOON,
+                    band_count=3,
+                    shadow_threshold=0.45,
+                    shadow_color="#2b2b2b",
+                    rim_light=RimLightProfile(enabled=True, intensity=0.8, width=0.2)
+                ),
+                outline=OutlineProfile(
+                    enabled=True,
+                    method=OutlineMethod.INVERTED_HULL,
+                    width=0.025,
+                    color="#000000"
+                ),
+                npr_profile=NPRProfileIR(
+                    layers=StyleLayerIR(
+                        curvature=CurvatureLayerIR(enabled=True, intensity=2.0, cavity_color="#000000"),
+                        grunge=GrungeLayerIR(enabled=True, intensity=1.5, scale=20.0, color="#1a1a1a"),
+                        hatching=HatchingLayerIR(enabled=True, intensity=0.7, scale=8.0)
+                    )
+                )
+            )
+        )
+
+    @staticmethod
+    def create_sketch(appearance_id: str = "sketch_base") -> AppearanceProfile:
+        return AppearanceProfile(
+            appearance_id=appearance_id,
+            family=AppearanceFamily.NPR,
+            style=StyleProfile(
+                style_type=StyleProfileType.SKETCH,
+                shading=ShadingProfile(
+                    model=ShaderModel.TOON,
+                    band_count=2,
+                    shadow_color="#444444",
+                    highlight_color="#f0f0f0"
+                ),
+                outline=OutlineProfile(
+                    enabled=True,
+                    method=OutlineMethod.INVERTED_HULL,
+                    width=0.01
+                ),
+                npr_profile=NPRProfileIR(
+                    layers=StyleLayerIR(
+                        hatching=HatchingLayerIR(enabled=True, coordinate_space="SCREEN", rotation_angle=45.0),
+                        temporal=TemporalBehaviorIR(enabled=True, update_rate=3) # Update sketch lines every 3 frames
+                    )
                 )
             )
         )
