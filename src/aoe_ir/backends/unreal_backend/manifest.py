@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 import json
 from dataclasses import asdict
 
@@ -15,22 +15,17 @@ class ManifestMaterialInstanceInfo:
 class PhysicsNodeInfo:
     bone_target: str
     physics_type: str # 'KawaiiPhysics' or 'AnimDynamics'
-    stiffness: float = 0.5
-    damping: float = 0.2
-
-@dataclass
-class MorphTargetInfo:
-    name: str
-    time: float = 0.0
-    value: float = 1.0
+    stiffness: Optional[float] = None
+    damping: Optional[float] = None
 
 @dataclass
 class UnrealAssetManifestIR:
     manifest_id: str = "Unknown"
     source_fbx_path: str = ""
+    facial_animation_path: str = ""
+    template_anim_bp: str = ""
     materials_config: List[ManifestMaterialInstanceInfo] = field(default_factory=list)
     physics_nodes: List[PhysicsNodeInfo] = field(default_factory=list)
-    morph_targets: List[MorphTargetInfo] = field(default_factory=list)
     destination_root: str = "/Game/AOE_Imports"
 
     def save_manifest(self, filepath: str):

@@ -44,7 +44,10 @@ def main():
         batch = ProductionBatchIR(batch_id=batch_data.get("batch_id", "batch"), recipes=recipes, output_directory=args.output)
 
         print(f"Executing Pipeline for {len(recipes)} characters...")
-        blender = BlenderBackend()
+        # Start real executor via script path and flag if configured in the environment,
+        # otherwise run in simulated mode, which is default for CLI batch jobs without a blender executable
+        use_real = os.environ.get("AOE_REAL_EXECUTION") == "1"
+        blender = BlenderBackend(use_real_executor=use_real, executor_script="tests/integration/blender/executor.py")
         unreal = UnrealBackend()
         orchestrator = AssetOrchestrator(blender_backend=blender, unreal_backend=unreal)
 

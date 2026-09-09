@@ -50,9 +50,14 @@ class BlenderBackend(RenderBackend):
 
             # Serialize the AssetIR to JSON so the blender python script can read it
             asset_dict = _dataclass_to_dict(asset)
+            fbx_path = kwargs.get("fbx_path")
+            if not fbx_path:
+                fbx_path = os.path.join(os.path.dirname(kwargs.get("filepath", "output.blend")), f"{getattr(asset, 'asset_id', getattr(asset, 'character_id', 'Unknown'))}.fbx")
+
             args = {
                 "asset": asset_dict,
                 "filepath": kwargs.get("filepath", "output.blend"),
+                "fbx_path": fbx_path,
                 "render_path": kwargs.get("render_path")
             }
 

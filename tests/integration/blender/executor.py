@@ -727,6 +727,23 @@ def main():
 
             logging.info("Render completed")
 
+        # Export FBX for UE5 Zero-Click
+        fbx_path = args.get("fbx_path")
+        if fbx_path:
+            logging.info(f"Exporting FBX to {fbx_path}")
+            bpy.ops.object.select_all(action='SELECT')
+            bpy.ops.export_scene.fbx(
+                filepath=fbx_path,
+                use_selection=True,
+                axis_forward='-Y',
+                axis_up='Z',
+                bake_space_transform=True,
+                use_mesh_modifiers=True,
+                mesh_smooth_type='FACE',
+                object_types={'ARMATURE', 'MESH'},
+                add_leaf_bones=False
+            )
+
         # Save .blend
         filepath = args.get("filepath")
         if filepath:
