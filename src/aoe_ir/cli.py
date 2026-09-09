@@ -39,6 +39,12 @@ def main():
                 appearance_profile=app,
                 style_profile=style
             )
+            if "lod_config" in r_data:
+                from .character import LODConfigIR
+                recipe.lod_config = LODConfigIR(**r_data["lod_config"])
+            if "qa_limits" in r_data:
+                from .character import QALimitsIR
+                recipe.qa_limits = QALimitsIR(**r_data["qa_limits"])
             recipes.append(recipe)
 
         batch = ProductionBatchIR(batch_id=batch_data.get("batch_id", "batch"), recipes=recipes, output_directory=args.output)

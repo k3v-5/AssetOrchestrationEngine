@@ -64,3 +64,7 @@ Saved/
 blender-4.0.2-linux-x64*
 output.blend
 artifacts/
+*.fbx
+*.blend
+*.png
+*_qa_report.json

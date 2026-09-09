@@ -58,7 +58,8 @@ class BlenderBackend(RenderBackend):
                 "asset": asset_dict,
                 "filepath": kwargs.get("filepath", "output.blend"),
                 "fbx_path": fbx_path,
-                "render_path": kwargs.get("render_path")
+                "render_path": kwargs.get("render_path"),
+                "qa_report_path": kwargs.get("qa_report_path", os.path.join(os.path.dirname(kwargs.get("filepath", "output.blend")), f"{getattr(asset, 'asset_id', getattr(asset, 'character_id', 'Unknown'))}_qa_report.json"))
             }
 
             try:

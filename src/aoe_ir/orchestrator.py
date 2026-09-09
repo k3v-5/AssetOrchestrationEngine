@@ -14,6 +14,8 @@ class CharacterRecipe:
     style_profile: StyleProfile
     animation_graph: Any = None
     ik_config: Any = None
+    lod_config: Any = None
+    qa_limits: Any = None
 
 @dataclass
 class ProductionBatchIR:
@@ -45,6 +47,10 @@ class AssetOrchestrator:
                 char.metadata["animation_graph"] = recipe.animation_graph
             if recipe.ik_config:
                 char.ik_config = recipe.ik_config
+            if recipe.lod_config:
+                char.lod_config = recipe.lod_config
+            if recipe.qa_limits:
+                char.qa_limits = recipe.qa_limits
 
             # 1. Pipeline Execution in Blender (Procedural Gen / Animation Bake)
             blender_result = self.blender_backend.export_asset(char)

@@ -2,6 +2,19 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 from enum import Enum
 from .appearance import AppearanceProfile
+from typing import List
+
+@dataclass
+class LODConfigIR:
+    levels: List[int] = field(default_factory=lambda: [50, 25, 10])
+    keep_inverted_hull: List[bool] = field(default_factory=lambda: [True, False, False])
+
+@dataclass
+class QALimitsIR:
+    max_triangles: int = 50000
+    max_bones: int = 100
+    max_texture_res: int = 4096
+
 from .skeleton import SkeletonIR, SkinningIR
 from .animation import AnimationFoundationIR
 from .ik import IKSolverConfigIR
@@ -51,4 +64,6 @@ class CharacterIR:
     ik_config: Optional[IKSolverConfigIR] = None
     face_rig: Optional[FaceRigIR] = None
     physics_rig: Optional[PhysicsRigIR] = None
+    lod_config: Optional[LODConfigIR] = None
+    qa_limits: Optional[QALimitsIR] = None
     metadata: Dict[str, str] = field(default_factory=dict)
