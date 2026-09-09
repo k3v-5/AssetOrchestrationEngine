@@ -13,6 +13,8 @@ class BackendCapabilities:
     stencil: bool = False
     post_process_outline: bool = False
     animation_deformation: bool = False
+    native_action_baking: bool = False # e.g. Blender bpy.data.actions
+    fbx_animation_export: bool = False # e.g. Unreal requirements
 
 class BackendCapabilityError(Exception):
     def __init__(self, required_capability: str, backend: str, reason: str):

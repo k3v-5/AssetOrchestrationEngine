@@ -1,6 +1,13 @@
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional
+from enum import Enum
 from .pose import PoseIR
+
+class InterpolationType(str, Enum):
+    LINEAR = "LINEAR"
+    BEZIER = "BEZIER"
+    CONSTANT = "CONSTANT"
+
 
 @dataclass
 class AnimationClipIR:
@@ -10,6 +17,8 @@ class AnimationClipIR:
     keyframes: Dict[int, PoseIR] = field(default_factory=dict) # frame -> Pose
     # Used to denote if the clip should loop conceptually
     is_looping: bool = False
+    # Explicit interpolation curve between keyframes
+    interpolation: InterpolationType = InterpolationType.BEZIER
 
 @dataclass
 class AnimationFoundationIR:

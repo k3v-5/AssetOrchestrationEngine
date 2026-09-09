@@ -16,7 +16,9 @@ class UnrealBackend(RenderBackend):
             semantic_overrides=True,
             stencil=True,
             post_process_outline=True,
-            animation_deformation=True
+            animation_deformation=True,
+            native_action_baking=False,
+            fbx_animation_export=True
         )
 
     def export_asset(self, asset: AssetIR, **kwargs) -> Dict[str, Any]:

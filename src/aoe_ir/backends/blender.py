@@ -34,7 +34,9 @@ class BlenderBackend(RenderBackend):
             semantic_overrides=True,
             stencil=False,
             post_process_outline=False,  # Not implemented in executor yet
-            animation_deformation=True
+            animation_deformation=True,
+            native_action_baking=True,
+            fbx_animation_export=False
         )
 
     def export_asset(self, asset: AssetIR, **kwargs) -> Dict[str, Any]:

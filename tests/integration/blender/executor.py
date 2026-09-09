@@ -496,6 +496,12 @@ def main():
                                     pbone.rotation_euler = transform.get("rotation_euler", (0,0,0))
                                     pbone.keyframe_insert(data_path="rotation_euler", frame=frame_idx)
 
+                    # Ensure interpolation matches AnimationClipIR
+                    interp = clip.get("interpolation", "BEZIER")
+                    for fcurve in action.fcurves:
+                        for kf in fcurve.keyframe_points:
+                            kf.interpolation = interp
+
             bpy.ops.object.mode_set(mode='OBJECT')
 
         # Support fallback for legacy deformation test
