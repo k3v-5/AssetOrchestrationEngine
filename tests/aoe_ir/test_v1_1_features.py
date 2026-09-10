@@ -38,7 +38,7 @@ class TestV1_1Features(unittest.TestCase):
             result = subprocess.run(cmd, capture_output=True, text=True)
 
             self.assertEqual(result.returncode, 0, f"CLI Failed: {result.stderr}")
-            self.assertIn("Pipeline Execution Complete!", result.stdout)
+            self.assertIn("Pipeline Execution Complete!", result.stderr)
 
 if __name__ == '__main__':
     unittest.main()

@@ -700,6 +700,19 @@ def main():
         qa_status = "success"
         qa_warnings = []
 
+        # Check texture resolutions
+        max_tex_limit = qa_limits.get("max_texture_res", 4096)
+        highest_res = 0
+        for img in bpy.data.images:
+            if img.size[0] > 0 and img.size[1] > 0: # Ensure it's loaded
+                res = max(img.size[0], img.size[1])
+                if res > highest_res:
+                    highest_res = res
+                if res > max_tex_limit:
+                    qa_status = "warning"
+                    qa_warnings.append(f"Texture resolution for '{img.name}' ({res}px) exceeds limit ({max_tex_limit}px).")
+                    logging.warning(f"QA WARNING: {qa_warnings[-1]}")
+
         if total_tris > qa_limits.get("max_triangles", 50000):
             qa_status = "warning"
             qa_warnings.append(f"Triangle count ({total_tris}) exceeds limit ({qa_limits.get('max_triangles', 50000)}).")

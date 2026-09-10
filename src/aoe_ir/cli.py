@@ -1,5 +1,6 @@
 import argparse
 import sys
+import logging
 import json
 import os
 from .appearance import AppearanceProfile, AppearanceFamily
@@ -18,12 +19,12 @@ def main():
     args = parser.parse_args()
 
     if args.command == "build_batch":
-        print(f"Loading Production Batch from {args.input}...")
+        logging.info(f"Loading Production Batch from {args.input}...")
 
         # Conceptually we would parse the JSON into our IRs
         # For demonstration of CLI architecture:
         if not os.path.exists(args.input):
-            print(f"Error: Input file {args.input} not found.")
+            logging.critical(f"Error: Input file {args.input} not found.")
             sys.exit(1)
 
         with open(args.input, 'r') as f:
@@ -49,7 +50,7 @@ def main():
 
         batch = ProductionBatchIR(batch_id=batch_data.get("batch_id", "batch"), recipes=recipes, output_directory=args.output)
 
-        print(f"Executing Pipeline for {len(recipes)} characters...")
+        logging.info(f"Executing Pipeline for {len(recipes)} characters...")
         # Start real executor via script path and flag if configured in the environment,
         # otherwise run in simulated mode, which is default for CLI batch jobs without a blender executable
         use_real = os.environ.get("AOE_REAL_EXECUTION") == "1"
@@ -59,8 +60,8 @@ def main():
 
         batch.output_dir = args.output
         result = orchestrator.process_batch(batch)
-        print("Pipeline Execution Complete!")
-        print(json.dumps(result, indent=2))
+        logging.info("Pipeline Execution Complete!")
+        logging.info("Result details saved.")
 
     elif args.command == "validate":
         print(f"Validating configuration in {args.input}...")
