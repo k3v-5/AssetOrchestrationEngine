@@ -31,6 +31,12 @@ class OutlineMethod(str, Enum):
     CUSTOM = "CUSTOM"
 
 @dataclass
+class NormalTransferIR:
+    enabled: bool = False
+    target_region: str = "face" # Semantic region to apply smooth normals
+    proxy_type: str = "SPHERE"
+
+@dataclass
 class OutlineProfile:
     enabled: bool = False
     method: OutlineMethod = OutlineMethod.NONE
