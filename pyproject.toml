@@ -13,6 +13,13 @@ dependencies = []
 [project.scripts]
 aoe = "aoe_cli:main"
 
+[tool.setuptools]
+package-dir = {"" = "src"}
+py-modules = ["aoe_cli"]
+
 [tool.setuptools.packages.find]
 where = ["src"]
-include = ["aoe_ir", "aoe_ir.*", "aoe_cli"]
+include = ["aoe_ir", "aoe_ir.*"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
