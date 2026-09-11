@@ -1,0 +1,40 @@
+{
+    "manifest_id": "test_npr",
+    "source_fbx_path": "",
+    "facial_animation_path": "",
+    "template_anim_bp": "",
+    "materials_config": [
+        {
+            "name": "MI_test_npr",
+            "parent": "/Game/AOE/Materials/M_AOE_NPR_Master",
+            "scalar_parameters": {
+                "BandCount": 4.0,
+                "ShadowThreshold": 0.5,
+                "ShadowSoftness": 0.0
+            },
+            "vector_parameters": {
+                "ShadowColor": [
+                    0.2,
+                    0.2,
+                    0.2980392156862745,
+                    1.0
+                ],
+                "MidtoneColor": [
+                    0.5019607843137255,
+                    0.5019607843137255,
+                    0.6,
+                    1.0
+                ],
+                "HighlightColor": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "base_textures": {}
+        }
+    ],
+    "physics_nodes": [],
+    "destination_root": "/Game/AOE_Imports/test_npr"
+}

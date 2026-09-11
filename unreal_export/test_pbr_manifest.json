@@ -1,0 +1,17 @@
+{
+    "manifest_id": "test_pbr",
+    "source_fbx_path": "",
+    "facial_animation_path": "",
+    "template_anim_bp": "",
+    "materials_config": [
+        {
+            "name": "MI_test_pbr",
+            "parent": "/Game/AOE/Materials/M_AOE_PBR_Master",
+            "scalar_parameters": {},
+            "vector_parameters": {},
+            "base_textures": {}
+        }
+    ],
+    "physics_nodes": [],
+    "destination_root": "/Game/AOE_Imports/test_pbr"
+}
