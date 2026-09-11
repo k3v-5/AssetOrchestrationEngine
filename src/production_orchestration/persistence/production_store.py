@@ -3,14 +3,12 @@ import json
 import threading
 from typing import Dict, Any, List, Optional
 from ..core.production_job import ProductionJob
-from ...core.storage_paths import get_default_storage_path
 
 class ProductionStore:
     """Thread-safe transactional JSON store for ProductionJobs and Plans."""
 
     def __init__(self, persistence_path: Optional[str] = None):
-        self.persistence_path = persistence_path or get_default_storage_path("Production", "production_store.json")
-
+        self.persistence_path = persistence_path or r"E:\Darx_Proyect\Saved\Production\darx_production_store.json"
         self._jobs: Dict[str, ProductionJob] = {}
         self._plans: Dict[str, Dict[str, Any]] = {}
         self._manifests: Dict[str, Dict[str, Any]] = {}
@@ -58,8 +56,10 @@ class ProductionStore:
                 "plans": self._plans,
                 "manifests": self._manifests
             }
-            with open(self.persistence_path, "w", encoding="utf-8") as f:
+            tmp_path = self.persistence_path + ".tmp"
+            with open(tmp_path, "w", encoding="utf-8") as f:
                 json.dump(data, f, indent=2, ensure_ascii=False)
+            os.replace(tmp_path, self.persistence_path)
 
     def load_from_disk(self):
         if not self.persistence_path or not os.path.exists(self.persistence_path):

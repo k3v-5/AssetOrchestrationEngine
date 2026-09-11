@@ -327,6 +327,54 @@ class TestSuitePhase80ProductionOrchestration(unittest.TestCase):
         self.assertTrue(ok)
         self.assertEqual(job.status, JobStatus.REGRESSION_CHECK)
 
+    def test_31_retry_rejected_production(self):
+        job = self.api.create_production_job("JOB_RETRY_REJ", "weapon.rifle.001")
+        self.api.plan_production(job.job_id)
+        self.api.start_production(job.job_id)
+        self.api.reject_production(job.job_id, "Visual defect detected")
+        self.assertEqual(self.api.get_production_status(job.job_id), JobStatus.REJECTED)
+
+        ok, msg = self.api.retry_production(job.job_id)
+        self.assertTrue(ok)
+        self.assertEqual(self.api.get_production_status(job.job_id), JobStatus.RUNNING)
+        loaded = self.api.store.get_job(job.job_id)
+        self.assertEqual(loaded.attempt, 2)
+
+    def test_32_cannot_approve_created_job(self):
+        job = self.api.create_production_job("JOB_APPR_ERR", "weapon.rifle.001")
+        ok, msg = self.api.approve_production(job.job_id)
+        self.assertFalse(ok)
+        self.assertIn("Illegal state transition", msg)
+
+    def test_33_cannot_reject_completed_job(self):
+        job = self.api.create_production_job("JOB_REJ_ERR", "weapon.rifle.001")
+        self.api.plan_production(job.job_id)
+        self.api.start_production(job.job_id)
+        self.api.approve_production(job.job_id)
+        ok, msg = self.api.reject_production(job.job_id, "Late reject")
+        self.assertFalse(ok)
+        self.assertIn("Illegal state transition", msg)
+
+    def test_34_create_pipeline_factory(self):
+        job = self.api.create_production_job("JOB_FACT", "weapon.rifle.001")
+        pipeline = self.api.create_pipeline(job.job_id)
+        self.assertEqual(pipeline.job.job_id, "JOB_FACT")
+
+    def test_35_multi_agent_bridge_authorized(self):
+        ok, msg = self.api.multi_agent_bridge.verify_agent_authorization("agent.geometry", "CAP_GEOMETRY")
+        self.assertTrue(ok)
+        self.assertEqual(msg, "Authorized")
+
+    def test_36_multi_agent_bridge_unauthorized_capability(self):
+        ok, msg = self.api.multi_agent_bridge.verify_agent_authorization("agent.geometry", "CAP_MATERIAL")
+        self.assertFalse(ok)
+        self.assertIn("GOVERNANCE_REJECTED", msg)
+
+    def test_37_multi_agent_bridge_unauthorized_agent(self):
+        ok, msg = self.api.multi_agent_bridge.verify_agent_authorization("agent.unauthorized", "CAP_GEOMETRY")
+        self.assertFalse(ok)
+        self.assertIn("GOVERNANCE_REJECTED", msg)
+
 if __name__ == "__main__":
     unittest.main()
 

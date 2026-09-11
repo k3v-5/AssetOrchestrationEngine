@@ -1513,11 +1513,22 @@ from .production_orchestration import (
 
 from .learned_construction_patterns import ProblemSignature
 
+from .asset_guardrails import (
+    GuardrailSeverity, SkeletalDiscrepancyType,
+    SpatialViolationType, CoplanarConflictType, RemediationStrategy,
+    BoneNode, SkeletalHierarchySpec, SkeletalDiscrepancy,
+    SkeletalReconciliationResult, EntitySpatialSpec,
+    SpatialClearanceViolation, SpatialClearanceResult,
+    SurfacePlaneSpec, CoplanarConflict, CoplanarRemediationResult,
+    SkeletalHierarchyGuard, SpatialClearanceGuard, CoplanarSurfaceGuard,
+    AssetGuardrailsAPI
+)
 
-
-
-
-
-
+from .anime_character_pipeline import (
+    AnimeProportionsPreset, AnimeEyeStyle, AnimeHairStyle,
+    NPROutlineMode, AnimeShadingModel, AnimeCharacterSpec,
+    AnimeHairStrandSpec, AnimeHeadTopologySpec, AnimeBodyTopologySpec,
+    NPROutlineSpec, AnimeCharacterBuildResult, AnimeCharacterAPI
+)
 
 

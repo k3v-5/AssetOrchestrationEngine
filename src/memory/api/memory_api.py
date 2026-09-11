@@ -1,5 +1,4 @@
 import time
-import uuid
 from typing import Dict, Any, List, Optional
 from ..core.memory_types import (
     MemoryRecord, MemoryType, MemoryScope, MemoryStatus, MemorySource
@@ -177,7 +176,7 @@ class ContextMemoryAPI:
     ) -> MemoryRecord:
         self.governance.validate_write_access(agent_id, MemoryScope.ASSET)
         rec = MemoryRecord(
-            memory_id=f"DEC_{uuid.uuid4().hex[:8]}",
+            memory_id=f"DEC_{int(time.time()*1000)%100000}",
             memory_type=MemoryType.DECISION_MEMORY,
             scope=MemoryScope.ASSET,
             semantic_id=semantic_id,
@@ -198,7 +197,7 @@ class ContextMemoryAPI:
         agent_id: str = "agent.visual.critic"
     ) -> MemoryRecord:
         rec = MemoryRecord(
-            memory_id=f"CRIT_{uuid.uuid4().hex[:8]}",
+            memory_id=f"CRIT_{int(time.time()*1000)%100000}",
             memory_type=MemoryType.FAILURE_MEMORY,
             scope=MemoryScope.ASSET,
             semantic_id=semantic_id,
@@ -220,7 +219,7 @@ class ContextMemoryAPI:
         agent_id: str
     ) -> MemoryRecord:
         rec = MemoryRecord(
-            memory_id=f"RES_{uuid.uuid4().hex[:8]}",
+            memory_id=f"RES_{int(time.time()*1000)%100000}",
             memory_type=MemoryType.OPERATION_MEMORY,
             scope=MemoryScope.ASSET,
             semantic_id=semantic_id,
@@ -233,7 +232,6 @@ class ContextMemoryAPI:
             tags=["result", "asset_state"]
         )
         return self.store_memory(rec)
-
 
     def build_execution_context(
         self,

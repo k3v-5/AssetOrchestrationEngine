@@ -26,7 +26,7 @@ class ProductionStateMachine:
         JobStatus.CANCELLED: set(), # Terminal
         JobStatus.PAUSED: {JobStatus.RUNNING, JobStatus.CANCELLED},
         JobStatus.RECOVERING: {JobStatus.RUNNING, JobStatus.FAILED, JobStatus.CANCELLED},
-        JobStatus.REJECTED: set()   # Terminal
+        JobStatus.REJECTED: {JobStatus.RECOVERING, JobStatus.CANCELLED}
     }
 
     @classmethod

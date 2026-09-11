@@ -12,11 +12,8 @@ from src.long_running_job_recovery import (
     ErrorCategory, RecoveryAction, JobError, JobCheckpoint
 )
 
-import tempfile
-
 class TestF70RealRecoveryEmpiricalSuite(unittest.TestCase):
-    STORAGE_DIR = os.path.join(tempfile.gettempdir(), "AOE_F70_Validation_Workspace")
-
+    STORAGE_DIR = r"E:\Darx_Proyect\Saved\F70_Validation_Workspace"
 
     def setUp(self):
         # Reset storage directory for fresh run
@@ -74,6 +71,10 @@ class TestF70RealRecoveryEmpiricalSuite(unittest.TestCase):
         # 3. Terminar abruptamente el proceso (KILL REAL)
         proc.kill()
         proc.wait()
+        if proc.stdout:
+            proc.stdout.close()
+        if proc.stderr:
+            proc.stderr.close()
         self.assertIsNotNone(proc.returncode, "El proceso debía estar completamente muerto.")
 
         # 4. Iniciar nuevo entorno AOE simulando reinicio del sistema

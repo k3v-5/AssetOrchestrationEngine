@@ -96,8 +96,11 @@ class ProductionOrchestratorAPI:
             items_to_create=items_to_create or [f"SM_{job.asset_semantic_id}"],
             items_to_modify=items_to_modify or []
         )
+        ok, msg = ProductionStateMachine.transition(job, JobStatus.PLANNED)
+        if not ok:
+            raise ValueError(f"Cannot plan job '{job_id}' in status {job.status.value}: {msg}")
+
         job.pipeline_plan = plan.to_dict()
-        ProductionStateMachine.transition(job, JobStatus.PLANNED)
         self.store.store_plan(plan_id, plan.to_dict())
         self.store.store_job(job)
         return plan
@@ -107,10 +110,9 @@ class ProductionOrchestratorAPI:
         if not job:
             return False, f"Job '{job_id}' not found."
 
-        if job.status not in (JobStatus.PLANNED, JobStatus.QUEUED, JobStatus.PAUSED):
-            return False, f"Cannot start job in status {job.status.value}"
-
-        ProductionStateMachine.transition(job, JobStatus.RUNNING)
+        ok, msg = ProductionStateMachine.transition(job, JobStatus.RUNNING)
+        if not ok:
+            return False, msg
         self.store.store_job(job)
         return True, "Production started"
 
@@ -119,10 +121,9 @@ class ProductionOrchestratorAPI:
         if not job:
             return False, f"Job '{job_id}' not found."
 
-        if job.status != JobStatus.RUNNING:
-            return False, f"Cannot pause job in status {job.status.value}"
-
-        ProductionStateMachine.transition(job, JobStatus.PAUSED)
+        ok, msg = ProductionStateMachine.transition(job, JobStatus.PAUSED)
+        if not ok:
+            return False, msg
         self.store.store_job(job)
         return True, "Production paused"
 
@@ -131,10 +132,9 @@ class ProductionOrchestratorAPI:
         if not job:
             return False, f"Job '{job_id}' not found."
 
-        if job.status != JobStatus.PAUSED:
-            return False, f"Cannot resume job in status {job.status.value}"
-
-        ProductionStateMachine.transition(job, JobStatus.RUNNING)
+        ok, msg = ProductionStateMachine.transition(job, JobStatus.RUNNING)
+        if not ok:
+            return False, msg
         self.store.store_job(job)
         return True, "Production resumed"
 
@@ -192,9 +192,13 @@ class ProductionOrchestratorAPI:
         if job.status not in (JobStatus.FAILED, JobStatus.REJECTED):
             return False, f"Cannot retry job in status {job.status.value}"
 
-        ProductionStateMachine.transition(job, JobStatus.RECOVERING)
+        ok1, msg1 = ProductionStateMachine.transition(job, JobStatus.RECOVERING)
+        if not ok1:
+            return False, msg1
         job.attempt += 1
-        ProductionStateMachine.transition(job, JobStatus.RUNNING)
+        ok2, msg2 = ProductionStateMachine.transition(job, JobStatus.RUNNING)
+        if not ok2:
+            return False, msg2
         self.store.store_job(job)
         return True, "Job retry initiated"
 
@@ -203,7 +207,9 @@ class ProductionOrchestratorAPI:
         if not job:
             return False, f"Job '{job_id}' not found."
 
-        ProductionStateMachine.transition(job, JobStatus.COMPLETED)
+        ok, msg = ProductionStateMachine.transition(job, JobStatus.COMPLETED)
+        if not ok:
+            return False, msg
         self.store.store_job(job)
         return True, "Production approved and marked COMPLETED"
 
@@ -212,7 +218,15 @@ class ProductionOrchestratorAPI:
         if not job:
             return False, f"Job '{job_id}' not found."
 
-        ProductionStateMachine.transition(job, JobStatus.REJECTED)
+        ok, msg = ProductionStateMachine.transition(job, JobStatus.REJECTED)
+        if not ok:
+            return False, msg
         job.failure_state = {"rejection_reason": reason}
         self.store.store_job(job)
         return True, f"Production rejected: {reason}"
+
+    def create_pipeline(self, job_id: str) -> ProductionPipeline:
+        job = self.store.get_job(job_id)
+        if not job:
+            raise KeyError(f"Job '{job_id}' not found.")
+        return ProductionPipeline(job)
