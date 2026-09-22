@@ -10,7 +10,7 @@ from .agents.correction_agent import CorrectionAgent
 from .governance.task_manager import TaskManager, AssetLockManager
 from .governance.checkpoint_manager import CheckpointManager, ReworkDetector
 from .execution.ai_orchestrator import AIOrchestrator
-from .api.build_orchestrator_api import BuildOrchestratorAPI
+from .api.build_orchestrator_api import BuildOrchestratorAPI, AssetEngineOrchestrator
 
 __all__ = [
     "AgentType",
@@ -34,5 +34,6 @@ __all__ = [
     "CheckpointManager",
     "ReworkDetector",
     "AIOrchestrator",
-    "BuildOrchestratorAPI"
+    "BuildOrchestratorAPI",
+    "AssetEngineOrchestrator"
 ]

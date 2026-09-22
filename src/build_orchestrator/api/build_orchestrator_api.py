@@ -26,3 +26,19 @@ class BuildOrchestratorAPI:
 
     def validate_tool_permission(self, agent_id: str, tool_name: str) -> bool:
         return self.orchestrator.registry.validate_tool_permission(agent_id, tool_name)
+
+    def calculate_weapon_muzzle_and_orientation(self, mesh_obj) -> Dict[str, Any]:
+        """
+        Calcula la boquilla y valida orientación canónica usando WeaponMuzzleCalculator.
+        """
+        from ...validation.weapon_muzzle_calculator import WeaponMuzzleCalculator
+        orientation_res = WeaponMuzzleCalculator.determinar_orientacion_forward(mesh_obj)
+        muzzle_loc = WeaponMuzzleCalculator.calcular_posicion_boquilla(mesh_obj)
+        return {
+            "orientation": orientation_res,
+            "muzzle_location": muzzle_loc,
+            "is_canonical": orientation_res.get("es_canonico", False)
+        }
+
+AssetEngineOrchestrator = BuildOrchestratorAPI
+
