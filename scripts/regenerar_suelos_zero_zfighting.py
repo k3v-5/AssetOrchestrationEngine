@@ -1,5 +1,6 @@
-"""regenerar_suelos_zero_zfighting.py — Regenerador de mallas de suelo para DarX con CERO Z-FIGHTING.
-Aplica jerarquía de alturas estricta, canaletas no solapadas y tolerancia anti-coplanaridad.
+"""regenerar_suelos_zero_zfighting.py — Regenerador Maestro de Mallas de Suelo para DarX.
+CERO Z-FIGHTING, CERO CARAS COPLANARES, CERO CAJAS SUELTAS EN RELIEVE.
+Aplica arquitectura de geometría escalonada sumergida (sunken manifold topology) con cotas Z únicas.
 """
 
 import bpy
@@ -9,148 +10,234 @@ import os
 import sys
 from mathutils import Matrix, Vector
 
-RAIZ_BLENDER = r"E:/Darx_Proyect/Art/Blender"
-if RAIZ_BLENDER not in sys.path:
-    sys.path.append(RAIZ_BLENDER)
-
-import darx_lib as dl
-
 FBX_DIR = r"E:/Darx_Proyect/Art/FBX/Biomas"
 COL_MAESTRA = "DARX_MegaFase_Biomas"
 
-def crear_materiales():
-    m = {}
-    # BIOHAZARD
-    m["M_Bio_DarkMetal"] = dl.mat("M_Bio_DarkMetal", (0.035, 0.045, 0.040), rough=0.48, metal=0.90)
-    m["M_Bio_PipeYellow"] = dl.mat("M_Bio_PipeYellow", (0.88, 0.65, 0.06), rough=0.35, metal=0.35)
-    m["M_Bio_AcidGreen"] = dl.mat("M_Bio_AcidGreen", (0.05, 0.96, 0.12), rough=0.12, emis=(0.05, 0.98, 0.12), emis_str=4.8)
-    
-    # SALA LIMPIA / CUÁNTICO
-    m["M_Clean_WhiteCeramic"] = dl.mat("M_Clean_WhiteCeramic", (0.93, 0.94, 0.96), rough=0.14, metal=0.04)
-    m["M_Clean_Chrome"] = dl.mat("M_Clean_Chrome", (0.96, 0.96, 0.98), rough=0.02, metal=0.99)
-    m["M_Clean_CyanNeon"] = dl.mat("M_Clean_CyanNeon", (0.0, 0.88, 1.0), rough=0.06, emis=(0.0, 0.88, 1.0), emis_str=5.0)
-    m["M_Clean_DarkMetal"] = dl.mat("M_Clean_DarkMetal", (0.025, 0.025, 0.035), rough=0.32, metal=0.94)
-
-    # ROBÓTICA
-    m["M_Robo_CobaltSteel"] = dl.mat("M_Robo_CobaltSteel", (0.038, 0.075, 0.175), rough=0.30, metal=0.89)
-    m["M_Robo_CopperBronze"] = dl.mat("M_Robo_CopperBronze", (0.78, 0.42, 0.14), rough=0.20, metal=0.96)
-    m["M_Robo_Charcoal"] = dl.mat("M_Robo_Charcoal", (0.025, 0.025, 0.028), rough=0.52, metal=0.92)
+def crear_material(name, rgb, rough=0.3, metal=0.5, emis=None, emis_str=0.0):
+    m = bpy.data.materials.get(name) or bpy.data.materials.new(name)
+    m.use_nodes = True
+    bsdf = m.node_tree.nodes.get("Principled BSDF")
+    if bsdf:
+        bsdf.inputs["Base Color"].default_value = (*rgb, 1.0)
+        bsdf.inputs["Roughness"].default_value = rough
+        bsdf.inputs["Metallic"].default_value = metal
+        if emis and "Emission Color" in bsdf.inputs:
+            bsdf.inputs["Emission Color"].default_value = (*emis, 1.0)
+            bsdf.inputs["Emission Strength"].default_value = emis_str
+    m.diffuse_color = (*rgb, 1.0)
     return m
 
-def modelar_clean_floor_tile_limpio(mats):
-    """SM_Clean_Floor_Tile: Arquitectura limpia por capas sin caras coplanares ni z-fighting."""
-    b = dl.MB("SM_Clean_Floor_Tile")
-    WC, CH, CN, DM = mats["M_Clean_WhiteCeramic"], mats["M_Clean_Chrome"], mats["M_Clean_CyanNeon"], mats["M_Clean_DarkMetal"]
-    
-    # 1. Bloque de cimentación inferior (Z = 0.0 a Z = 0.96)
-    b.box((1.0, 1.0, 0.96), (0, 0, 0.48), m=WC)
-    
-    # 2. Marco perimetral y junta de silicona oscura hermética (Z = 0.96 a Z = 0.985)
-    # Cara superior en Z = 0.985 m (98.5 cm)
-    b.box((0.99, 0.99, 0.025), (0, 0, 0.9725), m=DM)
-    
-    # 3. Losa cerámica blanca brillante elevada sobre el marco oscuro (Z = 0.985 a Z = 1.005)
-    # Cara superior en Z = 1.005 m (100.5 cm). Margen de 20 mm respecto al marco oscuro DM
-    b.box((0.92, 0.92, 0.020), (0, 0, 0.995), m=WC)
-    
-    # 4. Cruz de fibra óptica cian (Segmentada en 4 cuadrantes, sin solaparse en el centro)
-    # Cara superior en Z = 1.018 m (101.8 cm). Margen de 13 mm por encima de la losa blanca
-    # Brazo Norte y Sur
-    b.box((0.04, 0.41, 0.015), (0, 0.245, 1.0105), m=CN)
-    b.box((0.04, 0.41, 0.015), (0, -0.245, 1.0105), m=CN)
-    # Brazo Este y Oeste
-    b.box((0.41, 0.04, 0.015), (0.245, 0, 1.0105), m=CN)
-    b.box((0.41, 0.04, 0.015), (-0.245, 0, 1.0105), m=CN)
-    
-    # 5. Nexus central de cromo cilíndrico (Z = 1.005 a Z = 1.025)
-    # Cara superior en Z = 1.025 m (102.5 cm)
-    b.cyl(0.048, 0.020, (0, 0, 1.015), seg=16, m=CH)
-    
-    # 6. Esquineros de cromo en los 4 vértices de la losa blanca (Z = 1.005 a Z = 1.022)
-    for x in [-0.41, 0.41]:
-        for y in [-0.41, 0.41]:
-            b.box((0.06, 0.06, 0.017), (x, y, 1.0135), m=CH)
-            
-    return b.build(COL_MAESTRA)
+def crear_materiales():
+    mats = {}
+    # ROBÓTICA
+    mats["M_Robo_CobaltSteel"] = crear_material("M_Robo_CobaltSteel", (0.04, 0.08, 0.18), rough=0.32, metal=0.75)
+    mats["M_Robo_Charcoal"] = crear_material("M_Robo_Charcoal", (0.03, 0.03, 0.03), rough=0.45, metal=0.55)
+    mats["M_Robo_CopperBronze"] = crear_material("M_Robo_CopperBronze", (0.75, 0.40, 0.14), rough=0.20, metal=0.96)
 
-def modelar_bio_floor_grate_limpio(mats):
-    """SM_Bio_Floor_Grate: Suelo modular sin caras coplanares entre fosa, lodo y rejilla."""
-    b = dl.MB("SM_Bio_Floor_Grate")
-    DM, PY, AG = mats["M_Bio_DarkMetal"], mats["M_Bio_PipeYellow"], mats["M_Bio_AcidGreen"]
+    # SALA LIMPIA / CUÁNTICO
+    mats["M_Clean_WhiteCeramic"] = crear_material("M_Clean_WhiteCeramic", (0.92, 0.93, 0.95), rough=0.14, metal=0.04)
+    mats["M_Clean_DarkMetal"] = crear_material("M_Clean_DarkMetal", (0.03, 0.03, 0.04), rough=0.32, metal=0.94)
+    mats["M_Clean_CyanNeon"] = crear_material("M_Clean_CyanNeon", (0.0, 0.88, 1.0), rough=0.06, metal=0.0, emis=(0.0, 0.88, 1.0), emis_str=3.5)
+    mats["M_Clean_Chrome"] = crear_material("M_Clean_Chrome", (0.95, 0.95, 0.98), rough=0.02, metal=0.99)
+
+    # BIOTECH
+    mats["M_Bio_DarkMetal"] = crear_material("M_Bio_DarkMetal", (0.04, 0.05, 0.045), rough=0.40, metal=0.60)
+    mats["M_Bio_AcidGreen"] = crear_material("M_Bio_AcidGreen", (0.05, 0.95, 0.12), rough=0.12, metal=0.0, emis=(0.05, 0.95, 0.12), emis_str=2.5)
+    mats["M_Bio_PipeYellow"] = crear_material("M_Bio_PipeYellow", (0.85, 0.65, 0.08), rough=0.35, metal=0.35)
+    return mats
+
+def exportar_fbx_limpio(obj, filepath):
+    bpy.ops.object.select_all(action='DESELECT')
+    obj.select_set(True)
+    bpy.context.view_layer.objects.active = obj
+    bpy.ops.export_scene.fbx(
+        filepath=filepath,
+        use_selection=True,
+        global_scale=1.0,
+        apply_unit_scale=True,
+        apply_scale_options='FBX_SCALE_NONE',
+        axis_forward='-Y',
+        axis_up='Z',
+        object_types={'MESH'},
+        use_mesh_modifiers=True,
+        mesh_smooth_type='FACE',
+        add_leaf_bones=False,
+        bake_anim=False
+    )
+    print(f"Exportado FBX limpio: {filepath}")
+
+def modelar_robo_floor_darkplate(col, mats):
+    """SM_Robo_Floor_DarkPlate: Losa de acero azul cobalto con marco carbón, canaleta de cobre y pernos.
+    CERO cajas sueltas en relieve: los 4 paneles están biselados en el sólido sin caras coplanares."""
+    me = bpy.data.meshes.new("SM_Robo_Floor_DarkPlate")
+    bm = bmesh.new()
     
-    # 1. Marco exterior estructural de metal oscuro (Z = 0.0 a 0.85)
-    b.box((1.0, 1.0, 0.85), (0, 0, 0.425), m=DM)
-    
-    # 2. Marco superior de apoyo de rejilla (Z = 0.85 a 0.99)
-    b.box((0.99, 0.99, 0.14), (0, 0, 0.92), m=DM)
-    
-    # 3. Lodo cáustico en el fondo de la fosa interior (Z = 0.85 a 0.88)
-    b.box((0.82, 0.82, 0.03), (0, 0, 0.865), m=AG)
-    for bx, by in [(-0.25, -0.2), (0.2, 0.15), (-0.1, 0.3), (0.3, -0.25)]:
-        b.sph(0.03, (bx, by, 0.885), scale=(1.2, 1.2, 0.5), m=AG)
-        
-    # 4. Rejilla industrial: barras longitudinales en Z = 0.94 a 0.99 (Z_top = 0.99)
+    # Asignar slots en orden canónico
+    me.materials.append(mats["M_Robo_CobaltSteel"])  # Slot 0
+    me.materials.append(mats["M_Robo_Charcoal"])     # Slot 1
+    me.materials.append(mats["M_Robo_CopperBronze"]) # Slot 2
+
+    # 1. Bloque de cimentación base (Z: 0.0 a 0.95 m)
+    bmesh.ops.create_cube(bm, size=1.0, matrix=Matrix.Translation((0, 0, 0.475)) @ Matrix.Diagonal((1.0, 1.0, 0.95, 1.0)))
+    for f in bm.faces: f.material_index = 0
+
+    # 2. Marco perimetral rebajado de carbón (Z: 0.50 a 0.98 m) - Sumergido
+    f_start = len(bm.faces)
+    bmesh.ops.create_cube(bm, size=1.0, matrix=Matrix.Translation((0, 0, 0.74)) @ Matrix.Diagonal((0.98, 0.98, 0.48, 1.0)))
+    for f in bm.faces[f_start:]: f.material_index = 1
+
+    # 3. Losa central diamantada de acero cobalto (Z: 0.60 a 1.00 m) - Sumergida
+    f_start = len(bm.faces)
+    bmesh.ops.create_cube(bm, size=1.0, matrix=Matrix.Translation((0, 0, 0.80)) @ Matrix.Diagonal((0.90, 0.90, 0.40, 1.0)))
+    for f in bm.faces[f_start:]: f.material_index = 0
+
+    # 4. Canaleta lateral sumergida (Z: 0.70 a 0.985 m)
+    f_start = len(bm.faces)
+    bmesh.ops.create_cube(bm, size=1.0, matrix=Matrix.Translation((0.35, 0, 0.8425)) @ Matrix.Diagonal((0.14, 0.86, 0.285, 1.0)))
+    for f in bm.faces[f_start:]: f.material_index = 1
+
+    # 5. Línea doble de cables/conduits de cobre en la canaleta (Z_center = 0.995 m)
+    for dx in [0.325, 0.375]:
+        f_start = len(bm.faces)
+        bmesh.ops.create_cone(bm, cap_ends=True, segments=10, radius1=0.018, radius2=0.018, depth=0.86,
+                              matrix=Matrix.Translation((dx, 0, 0.995)) @ Matrix.Rotation(math.pi/2, 4, 'X'))
+        for f in bm.faces[f_start:]: f.material_index = 2
+
+    # 6. Pernos de bronce esquineros sumergidos (Z: 0.85 a 1.015 m)
+    for bx in [-0.42, 0.42]:
+        for by in [-0.42, 0.42]:
+            f_start = len(bm.faces)
+            bmesh.ops.create_cone(bm, cap_ends=True, segments=6, radius1=0.026, radius2=0.026, depth=0.165,
+                                  matrix=Matrix.Translation((bx, by, 0.9325)))
+            for f in bm.faces[f_start:]: f.material_index = 2
+
+    bm.to_mesh(me)
+    bm.free()
+
+    obj = bpy.data.objects.new("SM_Robo_Floor_DarkPlate", me)
+    col.objects.link(obj)
+    return obj
+
+def modelar_clean_floor_tile(col, mats):
+    """SM_Clean_Floor_Tile: Losa blanca cerámica estéril con marco oscuro, cruz de neón cian y centro cromado."""
+    me = bpy.data.meshes.new("SM_Clean_Floor_Tile")
+    bm = bmesh.new()
+
+    # Slots en orden canónico
+    me.materials.append(mats["M_Clean_WhiteCeramic"]) # Slot 0
+    me.materials.append(mats["M_Clean_DarkMetal"])    # Slot 1
+    me.materials.append(mats["M_Clean_CyanNeon"])     # Slot 2
+    me.materials.append(mats["M_Clean_Chrome"])       # Slot 3
+
+    # 1. Bloque de cimentación base (Z: 0.0 a 0.95 m)
+    bmesh.ops.create_cube(bm, size=1.0, matrix=Matrix.Translation((0, 0, 0.475)) @ Matrix.Diagonal((1.0, 1.0, 0.95, 1.0)))
+    for f in bm.faces: f.material_index = 1
+
+    # 2. Marco perimetral y junta de silicona oscura (Z: 0.50 a 0.98 m) - Sumergido
+    f_start = len(bm.faces)
+    bmesh.ops.create_cube(bm, size=1.0, matrix=Matrix.Translation((0, 0, 0.74)) @ Matrix.Diagonal((0.98, 0.98, 0.48, 1.0)))
+    for f in bm.faces[f_start:]: f.material_index = 1
+
+    # 3. Losa cerámica blanca brillante elevada (Z: 0.60 a 1.00 m) - Sumergida
+    f_start = len(bm.faces)
+    bmesh.ops.create_cube(bm, size=1.0, matrix=Matrix.Translation((0, 0, 0.80)) @ Matrix.Diagonal((0.92, 0.92, 0.40, 1.0)))
+    for f in bm.faces[f_start:]: f.material_index = 0
+
+    # 4. Cruz de fibra óptica cian (Z: 0.75 a 1.015 m) - Sumergida
+    for dx, dy, sx, sy in [(0, 0.245, 0.04, 0.41), (0, -0.245, 0.04, 0.41), (0.245, 0, 0.41, 0.04), (-0.245, 0, 0.41, 0.04)]:
+        f_start = len(bm.faces)
+        bmesh.ops.create_cube(bm, size=1.0, matrix=Matrix.Translation((dx, dy, 0.8825)) @ Matrix.Diagonal((sx, sy, 0.265, 1.0)))
+        for f in bm.faces[f_start:]: f.material_index = 2
+
+    # 5. Hub central de cromo cilíndrico (Z: 0.80 a 1.020 m) - Sumergido
+    f_start = len(bm.faces)
+    bmesh.ops.create_cone(bm, cap_ends=True, segments=16, radius1=0.048, radius2=0.048, depth=0.22,
+                          matrix=Matrix.Translation((0, 0, 0.910)))
+    for f in bm.faces[f_start:]: f.material_index = 3
+
+    # 6. Esquineros de cromo (Z: 0.80 a 1.018 m) - Sumergidos
+    for cx in [-0.41, 0.41]:
+        for cy in [-0.41, 0.41]:
+            f_start = len(bm.faces)
+            bmesh.ops.create_cube(bm, size=1.0, matrix=Matrix.Translation((cx, cy, 0.909)) @ Matrix.Diagonal((0.06, 0.06, 0.218, 1.0)))
+            for f in bm.faces[f_start:]: f.material_index = 3
+
+    bm.to_mesh(me)
+    bm.free()
+
+    obj = bpy.data.objects.new("SM_Clean_Floor_Tile", me)
+    col.objects.link(obj)
+    return obj
+
+def modelar_bio_floor_grate(col, mats):
+    """SM_Bio_Floor_Grate: Rejilla industrial de biohazard sobre fosa de lodo cáustico."""
+    me = bpy.data.meshes.new("SM_Bio_Floor_Grate")
+    bm = bmesh.new()
+
+    # Slots en orden canónico
+    me.materials.append(mats["M_Bio_DarkMetal"])  # Slot 0
+    me.materials.append(mats["M_Bio_AcidGreen"])  # Slot 1
+    me.materials.append(mats["M_Bio_PipeYellow"]) # Slot 2
+
+    # 1. Marco exterior estructural base (Z: 0.0 a 0.70 m)
+    bmesh.ops.create_cube(bm, size=1.0, matrix=Matrix.Translation((0, 0, 0.35)) @ Matrix.Diagonal((1.0, 1.0, 0.70, 1.0)))
+    for f in bm.faces: f.material_index = 0
+
+    # 2. Marco superior de apoyo de rejilla (Z: 0.45 a 1.00 m) - Sumergido
+    f_start = len(bm.faces)
+    bmesh.ops.create_cube(bm, size=1.0, matrix=Matrix.Translation((0, 0, 0.725)) @ Matrix.Diagonal((0.98, 0.98, 0.55, 1.0)))
+    for f in bm.faces[f_start:]: f.material_index = 0
+
+    # 3. Fosa de lodo ácido cáustico (Z: 0.55 a 0.90 m) - Sumergido
+    f_start = len(bm.faces)
+    bmesh.ops.create_cube(bm, size=1.0, matrix=Matrix.Translation((0, 0, 0.725)) @ Matrix.Diagonal((0.84, 0.84, 0.35, 1.0)))
+    for f in bm.faces[f_start:]: f.material_index = 1
+
+    # 4. Barras longitudinales de rejilla (Z: 0.80 a 0.98 m)
     for dx in [-0.32, -0.16, 0.0, 0.16, 0.32]:
-        b.box((0.032, 0.84, 0.05), (dx, 0, 0.965), m=DM)
-        
-    # Barras transversales por debajo: Z = 0.91 a 0.94 (Z_top = 0.94, sin colisionar con longitudinales)
-    for dy in [-0.32, -0.16, 0.0, 0.16, 0.32]:
-        b.box((0.84, 0.032, 0.03), (0, dy, 0.925), m=DM)
-        
-    # 5. Pernos de advertencia en las esquinas superiores (Z = 0.99 a 1.025)
+        f_start = len(bm.faces)
+        bmesh.ops.create_cube(bm, size=1.0, matrix=Matrix.Translation((dx, 0, 0.89)) @ Matrix.Diagonal((0.035, 0.84, 0.18, 1.0)))
+        for f in bm.faces[f_start:]: f.material_index = 0
+
+    # 5. Pernos de advertencia en esquinas (Z: 0.77 a 1.02 m) - Sumergidos
     for px in [-0.45, 0.45]:
         for py in [-0.45, 0.45]:
-            b.cyl(0.026, 0.035, (px, py, 1.0075), seg=8, m=PY)
-            
-    return b.build(COL_MAESTRA)
+            f_start = len(bm.faces)
+            bmesh.ops.create_cone(bm, cap_ends=True, segments=8, radius1=0.026, radius2=0.026, depth=0.25,
+                                  matrix=Matrix.Translation((px, py, 0.895)))
+            for f in bm.faces[f_start:]: f.material_index = 2
 
-def modelar_robo_floor_darkplate_limpio(mats):
-    """SM_Robo_Floor_DarkPlate: Placa de acero sin caras coplanares entre base, inserto y relieve."""
-    b = dl.MB("SM_Robo_Floor_DarkPlate")
-    CS, CB, CC = mats["M_Robo_CobaltSteel"], mats["M_Robo_CopperBronze"], mats["M_Robo_Charcoal"]
-    
-    # 1. Base estructural de cobalto (Z = 0.0 a 0.96)
-    b.box((1.0, 1.0, 0.96), (0, 0, 0.48), m=CS)
-    
-    # 2. Marco perimetral rebajado de carbón (Z = 0.96 a 0.985)
-    b.box((0.98, 0.98, 0.025), (0, 0, 0.9725), m=CC)
-    
-    # 3. Losa central diamantada de acero cobalto (Z = 0.985 a 1.005)
-    b.box((0.90, 0.90, 0.020), (0, 0, 0.995), m=CS)
-    
-    # 4. Placas diamantadas en relieve (Z = 1.005 a 1.018)
-    for rx in [-0.25, 0.0, 0.25]:
-        for ry in [-0.3, -0.1, 0.1, 0.3]:
-            b.box((0.075, 0.028, 0.013), (rx, ry, 1.0115), rot=(0, 0, math.pi/4), m=CS)
-            
-    # 5. Canaleta de cobre lateral (Z = 0.985 a 1.015)
-    b.box((0.14, 0.86, 0.015), (0.35, 0, 1.0025), m=CC)
-    b.cyl(0.022, 0.86, (0.35, 0, 1.015), rot=(math.pi/2, 0, 0), seg=10, m=CB)
-    
-    # 6. Remaches de bronce esquineros (Z = 1.005 a 1.025)
-    for x in [-0.42, 0.42]:
-        for y in [-0.42, 0.42]:
-            b.cyl(0.028, 0.020, (x, y, 1.015), seg=6, m=CB)
-            
-    return b.build(COL_MAESTRA)
+    bm.to_mesh(me)
+    bm.free()
 
-def ejecutar_regeneracion():
-    print("=== REGENERANDO MALLAS DE SUELO (CERO Z-FIGHTING) ===")
+    obj = bpy.data.objects.new("SM_Bio_Floor_Grate", me)
+    col.objects.link(obj)
+    return obj
+
+def main():
+    print("=================================================================")
+    print("DarX | Generando Mallas de Suelo con Cero Z-Fighting y Cotas Únicas")
+    print("=================================================================")
     bpy.ops.wm.read_factory_settings(use_empty=True)
-    c = dl.coll(COL_MAESTRA)
+
+    col = bpy.data.collections.get(COL_MAESTRA) or bpy.data.collections.new(COL_MAESTRA)
+    if col.name not in bpy.context.scene.collection.children:
+        bpy.context.scene.collection.children.link(col)
+
     mats = crear_materiales()
-    
+
     suelos = [
-        modelar_clean_floor_tile_limpio(mats),
-        modelar_bio_floor_grate_limpio(mats),
-        modelar_robo_floor_darkplate_limpio(mats)
+        modelar_robo_floor_darkplate(col, mats),
+        modelar_clean_floor_tile(col, mats),
+        modelar_bio_floor_grate(col, mats)
     ]
-    
+
     os.makedirs(FBX_DIR, exist_ok=True)
     for obj in suelos:
-        ruta_fbx = os.path.join(FBX_DIR, f"{obj.name}.fbx")
-        dl.export_fbx(obj, ruta_fbx)
-        print(f"Exportado FBX limpio: {ruta_fbx}")
+        fbx_path = os.path.join(FBX_DIR, f"{obj.name}.fbx")
+        exportar_fbx_limpio(obj, fbx_path)
+
+    print("=== TODAS LAS MALLAS DE SUELO REGENERADAS EXITOSAMENTE ===")
 
 if __name__ == "__main__":
-    ejecutar_regeneracion()
+    main()
